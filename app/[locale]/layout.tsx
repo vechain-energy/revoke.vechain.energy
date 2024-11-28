@@ -21,6 +21,7 @@ import timeagoJa from 'timeago.js/lib/lang/ja';
 import timeagoRu from 'timeago.js/lib/lang/ru';
 import timeagoZh from 'timeago.js/lib/lang/zh_CN';
 import '../../styles/index.css';
+import { VeChainProvider } from 'components/providers/VeChainProvider';
 
 timeago.register('es', timeagoEs);
 timeago.register('ja', timeagoJa);
@@ -70,16 +71,18 @@ const MainLayout = ({ children, params }: Props) => {
         <NextIntlClientProvider messages={{ common: messages.common }}>
           <QueryProvider>
             <EthereumProvider>
-              <ColorThemeProvider>
-                <div className="flex flex-col mx-auto min-h-screen">
-                  <Header />
-                  <main className="w-full grow">{children}</main>
-                  <div className="flex flex-col justify-end">
-                    <Footer />
+              <VeChainProvider>
+                <ColorThemeProvider>
+                  <div className="flex flex-col mx-auto min-h-screen">
+                    <Header />
+                    <main className="w-full grow">{children}</main>
+                    <div className="flex flex-col justify-end">
+                      <Footer />
+                    </div>
                   </div>
-                </div>
-                <ToastifyConfig />
-              </ColorThemeProvider>
+                  <ToastifyConfig />
+                </ColorThemeProvider>
+              </VeChainProvider>
             </EthereumProvider>
           </QueryProvider>
         </NextIntlClientProvider>

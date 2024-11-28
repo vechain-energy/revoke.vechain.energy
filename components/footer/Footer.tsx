@@ -7,6 +7,7 @@ import { ReactNode } from 'react';
 import LanguageSelect from './LanguageSelect';
 
 const Footer = () => {
+  return;
   const t = useTranslations();
 
   return (

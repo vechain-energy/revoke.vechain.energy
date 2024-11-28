@@ -76,7 +76,7 @@ const ChainSelect = ({ onSelect, selected, menuAlign, chainIds, instanceId, show
       formatOptionLabel={displayOption}
       menuPlacement="bottom"
       minMenuWidth="14.5rem"
-      placeholder={<PlaceholderIcon size={24} border />}
+      placeholder={selected ? displayOption({ chainId: selected, value: getChainName(selected) }, { context: 'menu' }) : <PlaceholderIcon size={24} border />}
       menuAlign={menuAlign}
       // Note: when searching, option do get unmounted, so there's still some optimization to be done here
       keepMounted

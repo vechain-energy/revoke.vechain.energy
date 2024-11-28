@@ -26,31 +26,31 @@ const ControlsWrapper = ({ chainId, address, switchChainSize, children, override
   const canSwitchChain = connector?.type === 'injected';
   const isChainSwitchEnabled = switchChainSize !== undefined;
   const shouldRenderSwitchChainButton = needsToSwitchChain && canSwitchChain && isChainSwitchEnabled;
-  const disabled = !isConnectedAddress || (needsToSwitchChain && !shouldRenderSwitchChainButton) || overrideDisabled;
+  // const disabled = !isConnectedAddress || (needsToSwitchChain && !shouldRenderSwitchChainButton) || overrideDisabled;
 
-  if (shouldRenderSwitchChainButton) {
-    return <SwitchChainButton chainId={chainId} size={switchChainSize} />;
-  }
+  // if (shouldRenderSwitchChainButton) {
+  //   return <SwitchChainButton chainId={chainId} size={switchChainSize} />;
+  // }
 
-  if (!isConnected) {
-    return <WithHoverTooltip tooltip={t('address.tooltips.connect_wallet')}>{children(disabled)}</WithHoverTooltip>;
-  }
+  // if (!isConnected) {
+  //   return <WithHoverTooltip tooltip={t('address.tooltips.connect_wallet')}>{children(disabled)}</WithHoverTooltip>;
+  // }
 
-  if (!isConnectedAddress) {
-    return <WithHoverTooltip tooltip={t('address.tooltips.connected_account')}>{children(disabled)}</WithHoverTooltip>;
-  }
+  // if (!isConnectedAddress) {
+  //   return <WithHoverTooltip tooltip={t('address.tooltips.connected_account')}>{children(disabled)}</WithHoverTooltip>;
+  // }
 
-  if (needsToSwitchChain) {
-    const tooltip = t.rich('address.tooltips.switch_chain', { chainName });
+  // if (needsToSwitchChain) {
+  //   const tooltip = t.rich('address.tooltips.switch_chain', { chainName });
 
-    return <WithHoverTooltip tooltip={tooltip}>{children(disabled)}</WithHoverTooltip>;
-  }
+  //   return <WithHoverTooltip tooltip={tooltip}>{children(disabled)}</WithHoverTooltip>;
+  // }
 
-  if (overrideDisabled && disabledReason) {
-    return <WithHoverTooltip tooltip={disabledReason}>{children(disabled)}</WithHoverTooltip>;
-  }
+  // if (overrideDisabled && disabledReason) {
+  //   return <WithHoverTooltip tooltip={disabledReason}>{children(disabled)}</WithHoverTooltip>;
+  // }
 
-  return <>{children(disabled)}</>;
+  return <>{children(false)}</>;
 };
 
 export default ControlsWrapper;

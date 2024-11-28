@@ -5,33 +5,33 @@ import ChainSelect from 'components/common/select/ChainSelect';
 import { useAddressPageContext } from 'lib/hooks/page-context/AddressPageContext';
 import { getNativeTokenPrice } from 'lib/price/utils';
 import { usePublicClient } from 'wagmi';
-import AddressDisplay from './AddressDisplay';
+import VeChainAddressDisplay from './VeChainAddressDisplay';
 import AddressSocialShareButtons from './AddressSocialShareButtons';
 import BalanceDisplay from './BalanceDisplay';
 import ConnectedLabel from './ConnectedLabel';
 import AddressNavigation from './navigation/AddressNavigation';
 
 const AddressHeader = () => {
-  const { address, domainName, selectedChainId, selectChain } = useAddressPageContext();
+  const { address, selectedChainId, selectChain } = useAddressPageContext();
   const publicClient = usePublicClient({ chainId: selectedChainId });
 
   const { data: balance, isLoading: balanceIsLoading } = useQuery({
-    queryKey: ['balance', address, publicClient.chain?.id],
+    queryKey: ['balance', address, selectedChainId],
     queryFn: () => publicClient.getBalance({ address }),
-    enabled: !!address && !!publicClient.chain,
+    enabled: !!address && !!selectedChainId,
   });
 
   const { data: nativeAssetPrice, isLoading: nativeAssetPriceIsLoading } = useQuery({
-    queryKey: ['nativeAssetPrice', publicClient.chain.id],
-    queryFn: () => getNativeTokenPrice(publicClient.chain.id, publicClient),
-    enabled: !!publicClient,
+    queryKey: ['nativeAssetPrice', selectedChainId],
+    queryFn: () => getNativeTokenPrice(selectedChainId, publicClient),
+    enabled: !!selectedChainId,
   });
 
   return (
     <div className="flex flex-col gap-2 mb-2 border border-black dark:border-white rounded-lg px-4 pt-3">
       <div className="flex flex-col sm:flex-row justify-between items-center gap-2">
         <div className="flex flex-col gap-2 items-center sm:items-start">
-          <AddressDisplay address={address} domainName={domainName} className="text-2xl font-bold" />
+          <VeChainAddressDisplay addressOrDomain={address} className="text-2xl font-bold" />
           <div className="flex flex-col sm:flex-row items-center gap-2">
             <div className="flex items-center gap-1 text-sm text-zinc-500 dark:text-zinc-400">
               <BalanceDisplay
@@ -40,13 +40,13 @@ const AddressHeader = () => {
                 isLoading={balanceIsLoading || nativeAssetPriceIsLoading}
               />
               <div className="leading-none">&bull;</div>
-              <AddressDisplay address={address} withCopyButton withTooltip />
+              <VeChainAddressDisplay addressOrDomain={address} withCopyButton withTooltip />
             </div>
             <ConnectedLabel address={address} />
           </div>
         </div>
         <div className="flex items-center gap-6">
-          <AddressSocialShareButtons address={address} />
+          {/* <AddressSocialShareButtons address={address} /> */}
           <ChainSelect instanceId="address-chain-select" selected={selectedChainId} onSelect={selectChain} />
         </div>
       </div>

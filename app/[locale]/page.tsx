@@ -36,10 +36,10 @@ const LandingPage: NextPage<Props> = ({ params }) => {
     <>
       <SharedLayout>
         <div className="flex flex-col items-center gap-8">
-          <HeroSection />
+          {/* <HeroSection />
           <HowTo />
           <WhyRevokeCash />
-          <LandingPageFaq />
+          <LandingPageFaq /> */}
         </div>
       </SharedLayout>
       <Script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />

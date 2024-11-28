@@ -166,13 +166,32 @@ export const getOpenSeaProxyAddress = async (userAddress: Address): Promise<Addr
   }
 };
 
+export const resolveVetName = async (name: string): Promise<Address | null> => {
+  try {
+    const response = await fetch(`https://vet.domains/api/lookup/name/${name}`);
+    if (response.ok) {
+      const data = await response.json();
+      if (isAddress(data.address)) {
+        return getAddress(data.address.toLowerCase());
+      }
+    }
+    return null;
+  } catch (error) {
+    console.error('Error resolving VET domain:', error);
+    return null;
+  }
+};
+
 export const parseInputAddress = async (inputAddressOrName: string): Promise<Address | undefined> => {
   const sanitisedInput = inputAddressOrName.trim().toLowerCase();
 
-  // We support ENS .eth and Avvy .avax domains, other domain-like inputs are interpreted as Unstoppable Domains
-  if (sanitisedInput.endsWith('.eth')) return resolveEnsName(sanitisedInput);
-  if (sanitisedInput.endsWith('.avax')) return resolveAvvyName(sanitisedInput);
-  if (sanitisedInput.includes('.')) return resolveUnsName(sanitisedInput);
+  // If it contains a dot, try to resolve it as a VET domain
+  if (sanitisedInput.includes('.')) {
+    const address = await resolveVetName(sanitisedInput);
+    if (address) return address;
+  }
+
+  // If it's not a domain or domain resolution failed, check if it's a direct address
   if (isAddress(sanitisedInput)) return getAddress(sanitisedInput);
 
   return undefined;

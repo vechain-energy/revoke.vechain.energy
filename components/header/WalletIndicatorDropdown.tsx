@@ -1,8 +1,9 @@
+'use client';
+
 import DropdownMenu, { DropdownMenuItem } from 'components/common/DropdownMenu';
-import { useNameLookup } from 'lib/hooks/ethereum/useNameLookup';
 import { shortenAddress } from 'lib/utils/formatting';
 import { useTranslations } from 'next-intl';
-import { useAccount, useDisconnect } from 'wagmi';
+import { useWallet, useVechainDomain } from '@vechain/dapp-kit-react';
 import ConnectButton from './ConnectButton';
 
 interface Props {
@@ -13,15 +14,15 @@ interface Props {
 
 const WalletIndicatorDropdown = ({ size, style, className }: Props) => {
   const t = useTranslations();
+  const { account, disconnect } = useWallet();
+  const { domain } = useVechainDomain({ addressOrDomain: account ?? '' });
 
-  const { address: account } = useAccount();
-  const { domainName } = useNameLookup(account);
-  const { disconnect } = useDisconnect();
+  const displayText = domain ?? (account ? shortenAddress(account, 4) : '');
 
   return (
     <div className="flex whitespace-nowrap">
       {account ? (
-        <DropdownMenu menuButton={domainName ?? shortenAddress(account, 4)}>
+        <DropdownMenu menuButton={displayText}>
           <DropdownMenuItem href={`/address/${account}${location.search}`} router>
             {t('common.buttons.my_allowances')}
           </DropdownMenuItem>

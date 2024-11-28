@@ -144,7 +144,7 @@ const TargetButton = forwardRef(
       }
 
       return selectProps.formatOptionLabel(option, {
-        context: 'value',
+        context: 'menu',
         inputValue: (option as any)?.label as string,
         selectValue: [option],
       });
