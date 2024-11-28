@@ -21,7 +21,7 @@ export const generateMetadata = async ({ params: { locale } }): Promise<Metadata
   const t = await getTranslations({ locale });
 
   return {
-    title: 'Revoke.vechain.energy - VeChain Token Approval Manager',
+    title: 'revoke.vechain.energy - VeChain Approval Manager',
     description: t('common.meta.description', { chainName: 'VeChain' }),
   };
 };

@@ -94,6 +94,10 @@
     "token_approval_checker": "代币授权检查器",
     "what_are_token_approvals": "什么是代币授权？"
   },
+  "hero": {
+    "title": "撤销 VeChain 授权",
+    "description": "通过管理和撤销您在 VeChain 上授予的代币授权来保持安全。输入您的地址以开始。"
+  },
   "meta": {
     "description": "撤销在 {chainName} 等 100+ 区块链上的代币授权，重新掌控自己的钱包，确保资金安全。",
     "title": "撤销 100+ 区块链网络上的代币授权"

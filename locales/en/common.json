@@ -89,6 +89,10 @@
     "token_approval_checker": "Token Approval Checker",
     "what_are_token_approvals": "What Are Token Approvals?"
   },
+  "hero": {
+    "title": "Revoke VeChain Approvals",
+    "description": "Stay safe by managing and revoking token approvals you have granted on VeChain. Enter your address below to get started."
+  },
   "meta": {
     "description": "Take back control of your wallet and stay safe by revoking token approvals and permissions you granted on {chainName}.",
     "title": "Revoke Your Token Approvals on VeChain"

@@ -89,6 +89,10 @@
     "token_approval_checker": "Verificador de Aprobaciones de Tokens",
     "what_are_token_approvals": "¿Qué son las Aprobaciones de Tokens?"
   },
+  "hero": {
+    "title": "Revocar Aprobaciones de VeChain",
+    "description": "Mantente seguro gestionando y revocando las aprobaciones de tokens que has otorgado en VeChain. Ingresa tu dirección a continuación para comenzar."
+  },
   "meta": {
     "description": "Retoma el control de tu billetera y mantente seguro revocando las aprobaciones y permisos de tokens que otorgaste en {chainName}.",
     "title": "Revoca tus Aprobaciones de Tokens en VeChain"
