@@ -1,4 +1,4 @@
-export const WHOIS_BASE_URL = 'https://whois.revoke.vechain.energy/generated';
+export const WHOIS_BASE_URL = 'https://whois.revoke.cash/generated';
 
 export const ADDRESS_ZERO_PADDED = '0x0000000000000000000000000000000000000000000000000000000000000000';
 export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000';

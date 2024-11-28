@@ -317,7 +317,7 @@ export const getPermitDomain = async (contract: Erc20TokenContract): Promise<Typ
 
 const getPermitDomainVersion = async (contract: Erc20TokenContract) => {
   const knownDomainVersions: Record<string, string> = {
-    '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48': '2', // USDC on Ethereum
+    '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48': '2', // USDC on VeChain
     '0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1': '2', // DAI on Arbitrum and Optimism (perhaps other chains too)
   };
 

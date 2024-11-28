@@ -45,10 +45,10 @@ const manifest = {
   currencies: [],
   content: {
     shortDescription: {
-      en: 'Revoke token approvals you granted on Ethereum and over 100 other networks.',
+      en: 'Revoke token approvals you granted on VeChain and over 100 other networks.',
     },
     description: {
-      en: 'Take back control of your wallet and stay safe by revoking token approvals you granted on Ethereum and over 100 other networks.',
+      en: 'Take back control of your wallet and stay safe by revoking token approvals you granted on VeChain and over 100 other networks.',
     },
   },
   permissions: [],
