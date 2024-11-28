@@ -1,7 +1,7 @@
 import { Table } from '@tanstack/react-table';
 import Button from 'components/common/Button';
 import Modal from 'components/common/Modal';
-import { useRevokeBatch } from 'lib/hooks/ethereum/useRevokeBatch';
+import { useVeChainRevokeBatch } from 'lib/hooks/vechain/useVeChainRevokeBatch';
 import { useAddressPageContext } from 'lib/hooks/page-context/AddressPageContext';
 import { AllowanceData } from 'lib/interfaces';
 import { useTranslations } from 'next-intl';
@@ -24,7 +24,7 @@ const BatchRevokeModalWithButton = ({ table }: Props) => {
     return table.getGroupedSelectedRowModel().flatRows.map((row) => row.original);
   }, [open]);
 
-  const { results, revoke, pause, isRevoking, isAllConfirmed } = useRevokeBatch(
+  const { results, revoke, pause, isRevoking, isAllConfirmed } = useVeChainRevokeBatch(
     selectedAllowances,
     table.options.meta.onUpdate,
   );
@@ -33,8 +33,8 @@ const BatchRevokeModalWithButton = ({ table }: Props) => {
     if (!open) pause();
   }, [open]);
 
-  const totalRevoked = Object.values(results).filter((result) => result.status === 'confirmed').length;
-  const totalReverted = Object.values(results).filter((result) => result.status === 'reverted').length;
+  const totalRevoked = Object.values(results || {}).filter((result) => result?.status === 'confirmed').length;
+  const totalReverted = Object.values(results || {}).filter((result) => result?.status === 'reverted').length;
 
   if (!selectedAllowances || !results) return null;
 

@@ -4,6 +4,11 @@ import { useVeChainDAppKitWallet } from './useVeChainDAppKit'
 import { getCurrentNetwork } from '../../utils/vechain'
 import { useConnex } from '@vechain/dapp-kit-react'
 
+const POLL_INTERVAL = 3000; // 3 seconds
+const MAX_ATTEMPTS = 20; // 1 minute total
+
+const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
 export function useVeChainWallet() {
   const {
     address,
@@ -24,14 +29,33 @@ export function useVeChainWallet() {
       const confirmation = async () => {
         if (!thor) throw new Error('Thor not available')
         
-        // Wait for the transaction to be mined and get receipt
-        const tx = thor.transaction(txid)
-        const receipt = await tx.getReceipt()
-        if (!receipt) throw new Error('Transaction failed')
-        
-        return {
-          ...receipt,
-          transactionHash: txid,
+        try {
+          // Poll for transaction receipt
+          let attempts = 0;
+          let receipt = null;
+          
+          while (attempts < MAX_ATTEMPTS) {
+            const tx = thor.transaction(txid)
+            receipt = await tx.getReceipt()
+            
+            if (receipt) {
+              if (receipt.reverted) {
+                throw new Error('Transaction reverted')
+              }
+              return {
+                ...receipt,
+                transactionHash: txid,
+              }
+            }
+            
+            attempts++;
+            await sleep(POLL_INTERVAL);
+          }
+          
+          throw new Error('Transaction confirmation timeout')
+        } catch (error) {
+          console.error('Transaction confirmation failed:', error)
+          throw new Error(error instanceof Error ? error.message : 'Transaction failed')
         }
       }
 
@@ -41,7 +65,7 @@ export function useVeChainWallet() {
       }
     } catch (error) {
       console.error('Transaction failed:', error)
-      throw error
+      throw error instanceof Error ? error : new Error('Transaction failed')
     }
   }
 

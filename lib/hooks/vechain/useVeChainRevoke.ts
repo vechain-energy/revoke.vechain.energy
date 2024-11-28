@@ -1,6 +1,7 @@
 'use client'
 
-import { AllowanceData, OnUpdate } from 'lib/interfaces'
+import { useCallback } from 'react'
+import { AllowanceData, OnUpdate, TransactionType } from 'lib/interfaces'
 import { useTransactionStore } from '../../stores/transaction-store'
 import { useVeChainWallet } from './useVeChainWallet'
 import { useConnex } from '@vechain/dapp-kit-react'
@@ -42,7 +43,7 @@ const ERC721_APPROVAL_FOR_ALL_ABI = [{
 }] as const
 
 export const useVeChainRevoke = (allowance: AllowanceData, onUpdate: OnUpdate) => {
-  const { updateTransaction } = useTransactionStore()
+  const store = useTransactionStore()
   const { sendTransaction } = useVeChainWallet()
 
   if (!allowance.spender) {
@@ -97,37 +98,41 @@ export const useVeChainRevoke = (allowance: AllowanceData, onUpdate: OnUpdate) =
     return sendTransaction(clause)
   }
 
-  const revoke = async () => {
+  const wrappedRevoke = useCallback(async () => {
     try {
-      updateTransaction(allowance, { status: 'pending' })
+      store.updateTransaction(allowance, { status: 'pending' })
+      
+      const revokeFunction = isErc721Contract(allowance.contract) 
+        ? revokeErc721Allowance 
+        : revokeErc20Allowance
 
-      const transactionPromise = isErc721Contract(allowance.contract)
-        ? revokeErc721Allowance()
-        : revokeErc20Allowance()
+      const transactionSubmitted = await revokeFunction()
 
-      const { hash, confirmation } = await transactionPromise
+      if (transactionSubmitted?.hash) {
+        store.updateTransaction(allowance, { 
+          status: 'pending', 
+          transactionHash: `0x${transactionSubmitted.hash}` as `0x${string}` 
+        })
 
-      updateTransaction(allowance, { status: 'pending', transactionHash: hash as `0x${string}` })
-
-      const receipt = await confirmation
-      updateTransaction(allowance, { status: 'confirmed', transactionHash: hash as `0x${string}` })
-
-      // Update the allowance data
-      const lastUpdated = {
-        timestamp: Math.floor(Date.now() / 1000),
-        blockNumber: Number(receipt.meta.blockNumber),
-        transactionHash: `0x${hash}` as `0x${string}`
+        // Wait for confirmation
+        await transactionSubmitted.confirmation
+        store.updateTransaction(allowance, { 
+          status: 'confirmed', 
+          transactionHash: `0x${transactionSubmitted.hash}` as `0x${string}` 
+        })
       }
 
-      onUpdate(allowance, { amount: 0n, lastUpdated })
-
-      return { hash, confirmation: Promise.resolve(receipt) }
+      return transactionSubmitted
     } catch (error) {
-      console.error('Failed to revoke:', error)
-      updateTransaction(allowance, { status: 'reverted', error: error.message })
+      const message = error instanceof Error ? error.message : 'Unknown error'
+      if (message.toLowerCase().includes('user rejected')) {
+        store.updateTransaction(allowance, { status: 'not_started' })
+      } else {
+        store.updateTransaction(allowance, { status: 'reverted', error: message })
+      }
       throw error
     }
-  }
+  }, [allowance, store])
 
-  return { revoke }
+  return { revoke: wrappedRevoke }
 } 
