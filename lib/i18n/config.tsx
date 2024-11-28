@@ -1,5 +1,4 @@
 import Href from 'components/common/Href';
-import { DISCORD_URL, TWITTER_URL } from 'lib/constants';
 import { RichTranslationValues } from 'next-intl';
 
 export const locales = ['en', 'es', 'ja', 'ru', 'zh'] as const;
@@ -28,16 +27,6 @@ export const defaultTranslationValues: RichTranslationValues = {
   ),
   'gashawk-link': (children) => (
     <Href href="https://gashawk.io" className="font-medium" underline="hover" html external>
-      {children}
-    </Href>
-  ),
-  'twitter-link': (children) => (
-    <Href href={TWITTER_URL} className="font-medium" underline="hover" html external>
-      {children}
-    </Href>
-  ),
-  'discord-link': (children) => (
-    <Href href={DISCORD_URL} className="font-medium" underline="hover" html external>
       {children}
     </Href>
   ),
