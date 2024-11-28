@@ -32,6 +32,12 @@ const nextConfig = {
       };
     }
     config.externals = [...(config.externals || []), 'pino-pretty', 'rate-limiter-flexible'];
+    
+    config.module.rules.push({
+      test: /rate-limiter-flexible/,
+      use: 'null-loader'
+    });
+
     return config;
   },
 };
