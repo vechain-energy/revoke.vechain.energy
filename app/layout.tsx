@@ -5,13 +5,13 @@ export const generateMetadata = async (): Promise<Metadata> => {
   const t = await getTranslations({ locale: 'en' });
 
   return {
-    metadataBase: new URL('https://revoke.cash'),
+    metadataBase: new URL('https://revoke.vechain.energy'),
     title: {
-      template: '%s | Revoke.cash',
+      template: '%s | revoke.vechain.energy',
       default: t('common.meta.title'),
     },
-    description: t('common.meta.description', { chainName: 'Ethereum' }),
-    applicationName: 'Revoke.cash',
+    description: t('common.meta.description', { chainName: 'VeChain' }),
+    applicationName: 'revoke.vechain.energy',
     generator: 'Next.js',
   };
 };
