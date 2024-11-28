@@ -8,8 +8,6 @@ const nextConfig = {
   experimental: {
     // Optimize client-side code
     optimizePackageImports: ['@heroicons/react'],
-    // Increase page data limit since we have a lot of client components
-    largePageDataBytes: 256 * 1024, // 256KB, double the default
   },
   compiler: {
     // Optimize client bundle
