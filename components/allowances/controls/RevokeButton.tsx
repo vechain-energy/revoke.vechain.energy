@@ -15,11 +15,6 @@ const RevokeButton = ({ allowance, disabled, revoke }: Props) => {
   const result = useTransactionStore((state) => state.results[getAllowanceKey(allowance)]);
   const loading = result?.status === 'pending';
 
-  console.log('RevokeButton translations:', {
-    revoke: t('common.buttons.revoke'),
-    revoking: t('common.buttons.revoking')
-  });
-
   return (
     <Button disabled={disabled} loading={loading} style="secondary" size="sm" onClick={revoke}>
       {loading ? t('common.buttons.revoking') : t('common.buttons.revoke')}
