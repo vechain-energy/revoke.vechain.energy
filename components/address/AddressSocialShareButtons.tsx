@@ -20,7 +20,7 @@ const AddressSocialShareButtons = ({ address }: Props) => {
       <LogoLink
         src={darkMode ? '/assets/images/vendor/etherscan-light.svg' : '/assets/images/vendor/etherscan.svg'}
         alt="Block Explorer Link"
-        href={`${explorerUrl}/address/${address}`}
+        href={`${explorerUrl}/account/${address}`}
         className="dark:bg-black"
       />
       <ShareButton />

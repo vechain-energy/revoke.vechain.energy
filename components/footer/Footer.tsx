@@ -12,8 +12,9 @@ const Footer = () => {
 
       <div className="mx-auto max-w-7xl px-8">
         <div className="my-16 flex flex-col md:flex-row items-center gap-4 justify-between">
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col">
             <p className="leading-5 text-zinc-100 dark:text-zinc-100">&copy; revoke.vechain.energy</p>
+            <p className="text-xs text-zinc-500 dark:text-zinc-500 pl-4">forked from revoke.cash</p>
           </div>
           <div className="flex gap-2 shrink-0">
             <LanguageSelect />

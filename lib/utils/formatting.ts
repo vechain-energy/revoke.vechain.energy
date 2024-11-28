@@ -4,13 +4,14 @@ import { isNullish } from '.';
 import { fixedPointMultiply } from './math';
 
 export const shortenAddress = (address?: string, characters: number = 6): string => {
-  return address && `${address.substr(0, 2 + characters)}...${address.substr(address.length - characters, characters)}`;
+  return address && `${address.substr(0, 2 + characters)}…${address.substr(address.length - characters, characters)}`;
 };
 
 export const shortenString = (name?: string, maxLength: number = 16): string | undefined => {
   if (!name) return undefined;
   if (name.length <= maxLength) return name;
-  return `${name.substr(0, maxLength - 3).trim()}...`;
+  const halfLength = Math.floor((maxLength - 2) / 2);
+  return `${name.slice(0, halfLength)}…${name.slice(-halfLength)}`;
 };
 
 export const formatFixedPointBigInt = (

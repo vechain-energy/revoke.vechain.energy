@@ -95,7 +95,7 @@
   },
   "signatures": {
     "info": {
-      "description": "Because signatures are not stored on the blockchain, <b>there is no way for Revoke.cash to know if you signed any signatures</b>. So this page contains a list of known marketplaces and a list of your tokens that support offchain <i>Permit</i> signatures. <b>Only if <i>you</i> know that you signed an offchain signature on a scam website, you need to cancel the <i>potential</i> signatures on this page</b>, otherwise you are wasting transaction fees. When you cancel potential signatures for a token or marketplace, they will remain in the list but cannot be cancelled again for some time."
+      "description": "Because signatures are not stored on the blockchain, <b>there is no way for to know if you signed any signatures</b>. So this page contains a list of known marketplaces and a list of your tokens that support offchain <i>Permit</i> signatures. <b>Only if <i>you</i> know that you signed an offchain signature on a scam website, you need to cancel the <i>potential</i> signatures on this page</b>, otherwise you are wasting transaction fees. When you cancel potential signatures for a token or marketplace, they will remain in the list but cannot be cancelled again for some time."
     },
     "marketplaces": {
       "active_approvals": "{count, plural, =1 {1 active approval} other {# active approvals}}",

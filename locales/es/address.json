@@ -95,7 +95,7 @@
   },
   "signatures": {
     "info": {
-      "description": "Debido a que las firmas no se almacenan en la blockchain, <b>no hay forma de que Revoke.cash sepa si firmó alguna firma</b>. Por lo tanto, esta página contiene una lista de mercados conocidos y una lista de sus tokens que <i>Admiten</i> firmas fuera de la cadena. <b>Solo si <i>Usted</i> sabe que firmó una firma fuera de la cadena en un sitio web fraudulento, debe cancelar las <i>potenciales</i> firmas en esta página</b>, de lo contrario estará desperdiciando tarifas de transacción. Cuando cancele posibles firmas para un token o mercado, permanecerán en la lista, pero no se podrán volver a cancelar durante algún tiempo."
+      "description": "Debido a que las firmas no se almacenan en la blockchain, <b>no hay forma sepa si firmó alguna firma</b>. Por lo tanto, esta página contiene una lista de mercados conocidos y una lista de sus tokens que <i>Admiten</i> firmas fuera de la cadena. <b>Solo si <i>Usted</i> sabe que firmó una firma fuera de la cadena en un sitio web fraudulento, debe cancelar las <i>potenciales</i> firmas en esta página</b>, de lo contrario estará desperdiciando tarifas de transacción. Cuando cancele posibles firmas para un token o mercado, permanecerán en la lista, pero no se podrán volver a cancelar durante algún tiempo."
     },
     "marketplaces": {
       "active_approvals": "{count, plural, =1 {1 aprobación activa} other {# aprobaciones activas}}",

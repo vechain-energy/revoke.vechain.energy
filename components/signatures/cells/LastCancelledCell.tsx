@@ -22,7 +22,7 @@ const LastCancelledCell = ({ chainId, lastCancelled }: Props) => {
   return (
     <div className="flex justify-start items-center font-monosans gap-2 w-40">
       <WithHoverTooltip tooltip={<TimeAgo datetime={lastCancelledDate} locale={locale} />}>
-        <Href underline="hover" href={`${explorerUrl}/tx/${lastCancelled.transactionHash}`} external>
+        <Href underline="hover" href={`${explorerUrl}/transaction/${lastCancelled.transactionHash}`} external>
           {formatDateNormalised(lastCancelledDate)}
         </Href>
       </WithHoverTooltip>

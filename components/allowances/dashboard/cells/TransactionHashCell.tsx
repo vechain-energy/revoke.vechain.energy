@@ -17,7 +17,7 @@ const TransactionHashCell = ({ chainId, transactionHash }: Props) => {
     <div className="flex justify-start items-center font-monosans gap-2 w-40">
       <Href
         underline="hover"
-        href={`${explorerUrl}/tx/${transactionHash}`}
+        href={`${explorerUrl}/transaction/${transactionHash}`}
         external
         className="flex items-center gap-1 tx-link"
       >

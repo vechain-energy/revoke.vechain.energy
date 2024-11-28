@@ -20,7 +20,7 @@ const TransactionSubmittedToast = ({ chainId, transactionHash, ref }: Props) => 
     <div className="flex flex-col justify-center items-center gap-2">
       <div className="flex gap-1">
         <div>{t('common.toasts.transaction_submitted')}</div>
-        <Href href={`${explorerUrl}/tx/${transactionHash}`} external>
+        <Href href={`${explorerUrl}/transaction/${transactionHash}`} external>
           <ArrowTopRightOnSquareIcon className="w-4 h-4" />
         </Href>
       </div>

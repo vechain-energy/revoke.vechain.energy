@@ -54,7 +54,7 @@ const ChainSelect = ({ onSelect, selected, menuAlign, chainIds, instanceId, show
 
     return (
       <div className="flex items-center gap-1">
-        {<ChainLogo chainId={chainId} checkMounted />}
+        {<ChainLogo chainId={chainId} checkMounted className='p-0.5'/>}
         {(context === 'menu' || showNames) && <div>{chainName}</div>}
       </div>
     );

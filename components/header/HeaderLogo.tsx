@@ -14,7 +14,7 @@ const HeaderLogo = () => {
         fetchPriority="high"
       />
       <Image
-        src="/assets/images/favicon.svg"
+        src="/assets/images/favicon-dark.svg"
         alt="vechain.energy"
         height="30"
         width="130"

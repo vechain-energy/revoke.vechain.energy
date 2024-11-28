@@ -25,7 +25,7 @@ const AssetCell = ({ asset }: Props) => {
     }
   }, [ref]);
 
-  const explorerUrl = `${getChainExplorerUrl(asset.chainId)}/address/${asset.contract.address}`;
+  const explorerUrl = `${getChainExplorerUrl(asset.chainId)}/account/${asset.contract.address}`;
 
   let link = (
     <Href href={explorerUrl} underline="hover" external className="truncate" ref={ref}>
