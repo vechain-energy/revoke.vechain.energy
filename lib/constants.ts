@@ -1,12 +1,5 @@
 export const WHOIS_BASE_URL = 'https://whois.revoke.vechain.energy/generated';
 
-export const CHROME_EXTENSION_URL =
-  'https://chrome.google.com/webstore/detail/revokecash/nmniboccheadcclilkfkonokbcoceced';
-export const FIREFOX_EXTENSION_URL = 'https://addons.mozilla.org/en-US/firefox/addon/revoke-cash/';
-export const DISCORD_URL = 'https://discord.gg/revoke-cash';
-export const GITHUB_URL = 'https://github.com/vechain.energy/revoke.vechain.energy';
-export const TWITTER_URL = 'https://twitter.com/RevokeCash';
-
 export const ADDRESS_ZERO_PADDED = '0x0000000000000000000000000000000000000000000000000000000000000000';
 export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000';
 export const DUMMY_ADDRESS_PADDED = '0x0000000000000000000000000000000000000000000000000000000000000001';
