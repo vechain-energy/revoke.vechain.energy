@@ -1,8 +1,6 @@
-import { useRevoke } from 'lib/hooks/ethereum/useRevoke';
-import { useVeChainRevoke } from 'lib/hooks/vechain/useVeChainRevoke';
 import { AllowanceData, OnUpdate } from 'lib/interfaces';
-import { ChainId } from '@revoke.cash/chains';
-import ControlsSection from '../../controls/ControlsSection';
+import { useVeChainRevoke } from 'lib/hooks/vechain/useVeChainRevoke';
+import ControlsSection from 'components/allowances/controls/ControlsSection';
 
 interface Props {
   allowance: AllowanceData;
@@ -10,15 +8,25 @@ interface Props {
 }
 
 const ControlsCell = ({ allowance, onUpdate }: Props) => {
-  const isVeChain = allowance.chainId === ChainId.VeChain || allowance.chainId === ChainId.VeChainTestnet;
-  const { revoke: ethereumRevoke } = useRevoke(allowance, onUpdate);
-  const { revoke: vechainRevoke } = useVeChainRevoke(allowance, onUpdate);
+  const { revoke } = useVeChainRevoke(allowance, onUpdate);
 
-  const revoke = isVeChain ? vechainRevoke : ethereumRevoke;
+  const handleRevoke = async () => {
+    const result = await revoke();
+    return {
+      hash: `0x${result.hash}` as `0x${string}`,
+      wait: async () => {
+        const confirmation = await result.confirmation;
+        return {
+          transactionHash: `0x${confirmation.transactionHash}` as `0x${string}`,
+        };
+      },
+    };
+  };
 
   return (
     <div className="flex justify-end w-28 mr-0 mx-auto">
-      <ControlsSection allowance={allowance} revoke={revoke} />
+      {/* @ts-ignore - Type mismatch between VeChain and Ethereum transaction types */}
+      <ControlsSection allowance={allowance} revoke={handleRevoke} />
     </div>
   );
 };

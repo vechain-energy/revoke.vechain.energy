@@ -107,16 +107,16 @@ export const useVeChainRevoke = (allowance: AllowanceData, onUpdate: OnUpdate) =
 
       const { hash, confirmation } = await transactionPromise
 
-      updateTransaction(allowance, { status: 'submitted', transactionHash: hash })
+      updateTransaction(allowance, { status: 'pending', transactionHash: hash as `0x${string}` })
 
       const receipt = await confirmation
-      updateTransaction(allowance, { status: 'confirmed', transactionHash: hash })
+      updateTransaction(allowance, { status: 'confirmed', transactionHash: hash as `0x${string}` })
 
       // Update the allowance data
       const lastUpdated = {
         timestamp: Math.floor(Date.now() / 1000),
         blockNumber: Number(receipt.meta.blockNumber),
-        transactionHash: hash
+        transactionHash: `0x${hash}` as `0x${string}`
       }
 
       onUpdate(allowance, { amount: 0n, lastUpdated })

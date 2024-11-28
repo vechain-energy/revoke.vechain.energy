@@ -19,7 +19,7 @@ const ChainDescription = ({ chainId, headingElement }: Props) => {
   const t = useTranslations();
 
   const mainnetChainId = getCorrespondingMainnetChainId(chainId) ?? chainId;
-  const isTestnet = CHAIN_SELECT_TESTNETS.includes(chainId);
+  const isTestnet = false // CHAIN_SELECT_TESTNETS.includes(chainId);
   const isCanary = !isTestnet && chainId !== mainnetChainId;
 
   const mainnetChainSlug = getChainSlug(mainnetChainId);

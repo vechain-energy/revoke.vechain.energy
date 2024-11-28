@@ -1,11 +1,8 @@
 import Button from 'components/common/Button';
-import TipSection from 'components/common/donate/TipSection';
-import { useDonate } from 'lib/hooks/ethereum/useDonate';
 import { useAddressPageContext } from 'lib/hooks/page-context/AddressPageContext';
 import { AllowanceData } from 'lib/interfaces';
 import { track } from 'lib/utils/analytics';
 import { useTranslations } from 'next-intl';
-import { useState } from 'react';
 import ControlsWrapper from '../ControlsWrapper';
 
 interface Props {
@@ -20,27 +17,14 @@ const BatchRevokeControls = ({ selectedAllowances, isRevoking, isAllConfirmed, s
   const t = useTranslations();
   const { address, selectedChainId } = useAddressPageContext();
 
-  const { donate, nativeToken, defaultAmount } = useDonate(selectedChainId, 'batch-revoke-tip');
-  const [tipAmount, setTipAmount] = useState<string | null>(null);
-
-  const revokeAndTip = async (tipAmount: string | null) => {
-    const getTipSelection = () => {
-      if (tipAmount === '0') return 'none';
-      if (Number(tipAmount) < Number(defaultAmount)) return 'low';
-      if (Number(tipAmount) > Number(defaultAmount)) return 'high';
-      return 'mid';
-    };
-
+  const handleRevoke = async () => {
     track('Batch Revoked', {
       chainId: selectedChainId,
       address,
       allowances: selectedAllowances.length,
-      amount: tipAmount,
-      tipSelection: getTipSelection(),
     });
 
     await revoke();
-    await donate(tipAmount);
   };
 
   const getButtonText = () => {
@@ -51,18 +35,12 @@ const BatchRevokeControls = ({ selectedAllowances, isRevoking, isAllConfirmed, s
 
   const getButtonAction = () => {
     if (isAllConfirmed) return () => setOpen(false);
-    return () => revokeAndTip(tipAmount);
+    return handleRevoke;
   };
 
   return (
     <div className="flex flex-col items-center justify-center gap-4">
-      <TipSection midAmount={defaultAmount} nativeToken={nativeToken} onSelect={setTipAmount} />
-      <ControlsWrapper
-        chainId={selectedChainId}
-        address={address}
-        overrideDisabled={!tipAmount}
-        disabledReason={t('address.tooltips.select_tip')}
-      >
+      <ControlsWrapper chainId={selectedChainId} address={address}>
         {(disabled) => (
           <div>
             <Button

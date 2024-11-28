@@ -1,7 +1,6 @@
 'use client';
 
 import DropdownMenu, { DropdownMenuItem } from 'components/common/DropdownMenu';
-import DonateButtonDropdown from 'components/common/donate/DonateButtonDropdown';
 import { usePathname } from 'lib/i18n/navigation';
 import { useTranslations } from 'next-intl';
 import { twMerge } from 'tailwind-merge';
@@ -27,10 +26,6 @@ const MoreDropdown = () => {
       <DropdownMenuItem href="/about" router className="text-lg">
         {t('common.nav.about')}
       </DropdownMenuItem>
-      <DropdownMenuItem href="/merchandise" router className="text-lg">
-        {t('common.nav.merchandise')}
-      </DropdownMenuItem>
-      <DonateButtonDropdown className="text-lg" />
     </DropdownMenu>
   );
 };

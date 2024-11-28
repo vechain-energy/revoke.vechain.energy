@@ -61,10 +61,6 @@
           "description": "Download the Revoke.cash browser extension.",
           "title": "Extension"
         },
-        "faq": {
-          "description": "Answers to all your questions.",
-          "title": "FAQ"
-        },
         "title": "Are you looking for one of these?",
         "your_allowances": {
           "description": "Inspect your own approvals.",
@@ -85,7 +81,6 @@
     "company": "Company",
     "exploit_checker": "Exploit Checker",
     "extension": "Browser Extension",
-    "faq": "FAQ",
     "knowledgebase": "Knowledgebase",
     "learn": "Learn",
     "privacy": "Privacy Policy",
@@ -95,8 +90,8 @@
     "what_are_token_approvals": "What Are Token Approvals?"
   },
   "meta": {
-    "description": "Take back control of your wallet and stay safe by revoking token approvals and permissions you granted on {chainName} and over 100 other networks.",
-    "title": "Revoke Your Token Approvals on Over 100 Networks"
+    "description": "Take back control of your wallet and stay safe by revoking token approvals and permissions you granted on {chainName}.",
+    "title": "Revoke Your Token Approvals on VeChain"
   },
   "misc": {
     "powered_by": "Powered by <powered-by-link>{name}</powered-by-link>"
@@ -108,7 +103,6 @@
     "extension": "Extension",
     "faq": "FAQ",
     "learn": "Learn",
-    "merchandise": "Merchandise",
     "more": "More",
     "search": "Search Accounts by Address or Domain"
   },

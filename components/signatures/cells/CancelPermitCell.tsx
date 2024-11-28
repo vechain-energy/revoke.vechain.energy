@@ -43,7 +43,7 @@ const CancelPermitCell = ({ token, onCancel }: Props) => {
   };
 
   const cancel = async (): Promise<TransactionSubmitted> => {
-    return handleTransaction(sendCancelTransaction(), TransactionType.OTHER);
+    return handleTransaction(sendCancelTransaction(), TransactionType.REVOKE);
   };
 
   return <CancelCell chainId={selectedChainId} address={address} lastCancelled={token.lastCancelled} cancel={cancel} />;

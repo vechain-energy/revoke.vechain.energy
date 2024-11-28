@@ -44,7 +44,7 @@ const CancelMarketplaceCell = ({ marketplace, onCancel }: Props) => {
   };
 
   const cancel = async (): Promise<TransactionSubmitted> => {
-    return handleTransaction(sendCancelTransaction(), TransactionType.OTHER);
+    return handleTransaction(sendCancelTransaction(), TransactionType.REVOKE);
   };
 
   return (

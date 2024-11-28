@@ -1,8 +1,5 @@
 import SharedLayout from 'app/layouts/SharedLayout';
 import HeroSection from 'components/landing/HeroSection';
-import HowTo from 'components/landing/HowTo';
-import LandingPageFaq from 'components/landing/LandingPageFaq';
-import WhyRevokeCash from 'components/landing/WhyRevokeCash';
 import type { Metadata, NextPage } from 'next';
 import { getTranslations, unstable_setRequestLocale } from 'next-intl/server';
 import Script from 'next/script';
@@ -16,16 +13,16 @@ interface Props {
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
-  logo: 'https://revoke.cash/assets/images/revoke-icon-orange-black.svg',
-  url: 'https://revoke.cash',
+  logo: 'https://revoke.vechain.energy/assets/images/revoke-icon-orange-black.svg',
+  url: 'https://revoke.vechain.energy',
 };
 
 export const generateMetadata = async ({ params: { locale } }): Promise<Metadata> => {
   const t = await getTranslations({ locale });
 
   return {
-    title: t('common.meta.title'),
-    description: t('common.meta.description', { chainName: 'Ethereum' }),
+    title: 'Revoke.vechain.energy - VeChain Token Approval Manager',
+    description: t('common.meta.description', { chainName: 'VeChain' }),
   };
 };
 
@@ -34,12 +31,9 @@ const LandingPage: NextPage<Props> = ({ params }) => {
 
   return (
     <>
-      <SharedLayout>
-        <div className="flex flex-col items-center gap-8">
-          {/* <HeroSection />
-          <HowTo />
-          <WhyRevokeCash />
-          <LandingPageFaq /> */}
+      <SharedLayout searchBar={false}>
+        <div className="flex flex-col items-center">
+          <HeroSection />
         </div>
       </SharedLayout>
       <Script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />

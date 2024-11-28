@@ -34,11 +34,8 @@ const Footer = () => {
               <FooterLink href="/learn" router>
                 {t('common.footer.knowledgebase')}
               </FooterLink>
-              <FooterLink href="/learn/approvals/what-are-token-approvals" router>
+              <FooterLink href="/learn/what-are-token-approvals" router>
                 {t('common.footer.what_are_token_approvals')}
-              </FooterLink>
-              <FooterLink href="/learn/faq" router>
-                {t('common.footer.faq')}
               </FooterLink>
             </FooterSection>
           </div>
@@ -69,13 +66,8 @@ const Footer = () => {
         </div>
         <Divider className="my-16 border-zinc-900 dark:border-zinc-800" />
         <div className="my-16 flex flex-col md:flex-row items-center gap-4 justify-between">
-          <div className="flex flex-col gap-px text-center md:text-left">
-            <p className="leading-5 text-zinc-100 dark:text-zinc-100">&copy; 2024 Revoke.cash</p>
-            <ul className="flex justify-center md:justify-start items-center gap-1">
-              <FooterLink href="/privacy-policy">{t('common.footer.privacy')}</FooterLink>
-              <span className="text-zinc-400 dark:text-zinc-400 visited:text-zinc-400">•</span>
-              <FooterLink href="/terms">{t('common.footer.terms')}</FooterLink>
-            </ul>
+          <div className="flex flex-col gap-4">
+            <p className="leading-5 text-zinc-100 dark:text-zinc-100">&copy; 2024 revoke.vechain.energy</p>
           </div>
           <div className="flex gap-2 shrink-0">
             <LanguageSelect />

@@ -27,30 +27,13 @@ const NotFoundPage: NextPage<Props> = ({ params }) => {
           <p className="text-lg text-zinc-500 dark:text-zinc-400">{t('common.errors.404.subtitle')}</p>
         </div>
         <div className="flex flex-col gap-4">
-          <h2 className="text-base font-semibold text-zinc-500 dark:text-zinc-400">
-            {t('common.errors.404.suggested_pages.title')}
-          </h2>
-          <div className="divide-y divide-zinc-200 dark:divide-zinc-800 border-y border-zinc-200 dark:border-zinc-800">
-            <NotFoundLink
-              title={t('common.errors.404.suggested_pages.faq.title')}
-              href="/learn/faq"
-              description={t('common.errors.404.suggested_pages.faq.description')}
-              icon={<QuestionMarkCircleIcon className="h-6 w-6" />}
-            />
-            <NotFoundLink
-              title={t('common.errors.404.suggested_pages.extension.title')}
-              href="/extension"
-              description={t('common.errors.404.suggested_pages.extension.description')}
-              icon={<GlobeEuropeAfricaIcon className="h-6 w-6" />}
-            />
-            <NotFoundLinkMyApprovals />
-          </div>
-          <p>
-            <Href href="/" className="font-medium" underline="none">
-              {t('common.errors.404.go_home')} &rarr;
-            </Href>
-          </p>
+          <h2 className="text-lg font-bold">{t('common.errors.404.suggested_pages.title')}</h2>
         </div>
+        <p>
+          <Href href="/" className="font-medium" underline="none">
+            {t('common.errors.404.go_home')} &rarr;
+          </Href>
+        </p>
       </div>
     </ContentPageLayout>
   );

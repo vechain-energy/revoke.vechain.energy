@@ -1,5 +1,4 @@
 import { ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline';
-import DonateButton from 'components/common/donate/DonateButton';
 import { getChainExplorerUrl } from 'lib/utils/chains';
 import { useTranslations } from 'next-intl';
 import type { MutableRefObject } from 'react';
@@ -24,9 +23,6 @@ const TransactionSubmittedToast = ({ chainId, transactionHash, ref }: Props) => 
         <Href href={`${explorerUrl}/tx/${transactionHash}`} external>
           <ArrowTopRightOnSquareIcon className="w-4 h-4" />
         </Href>
-      </div>
-      <div>
-        <DonateButton size="sm" parentToastRef={ref} type="transaction-toast" />
       </div>
     </div>
   );

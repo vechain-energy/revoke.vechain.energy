@@ -1,58 +1,42 @@
 const withBundleAnalyzer = require('next-bundle-analyzer')({ enabled: process.env.ANALYZE === 'true' });
 const withNextIntl = require('next-intl/plugin')();
-const withNextCircularDeps = require('next-circular-dependency');
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
   productionBrowserSourceMaps: true,
-  exclude: /a\.js|node_modules/, // exclude node_modules for checking circular dependencies
-  redirects: async () => {
-    return [
-      {
-        source: '/:locale(en|es|ja|ru|zh)/faq',
-        destination: '/:locale/learn/faq',
-        permanent: true,
-      },
-      {
-        source: '/faq',
-        destination: '/learn/faq',
-        permanent: true,
-      },
-      {
-        source: '/:locale(en|es|ja|ru|zh)/learn/wallets/add-network',
-        destination: '/:locale/learn/wallets/add-network/ethereum',
-        permanent: true,
-      },
-      {
-        source: '/learn/wallets/add-network',
-        destination: '/learn/wallets/add-network/ethereum',
-        permanent: true,
-      },
-      // Some images are somehow being requested (probably by other websites). We redirect them to a placeholder image.
-      {
-        source: '/erc20.png',
-        destination: 'https://upload.wikimedia.org/wikipedia/commons/e/e0/SNice.svg',
-        permanent: true,
-      },
-      {
-        source: '/assets/images/fallback-token-image.png',
-        destination: 'https://upload.wikimedia.org/wikipedia/commons/e/e0/SNice.svg',
-        permanent: true,
-      },
-    ];
+  experimental: {
+    // Optimize client-side code
+    optimizePackageImports: ['@heroicons/react'],
+    // Increase page data limit since we have a lot of client components
+    largePageDataBytes: 256 * 1024, // 256KB, double the default
   },
-  webpack: (config) => {
-    config.resolve.fallback = { fs: false, path: false };
-    config.externals.push('pino-pretty');
+  compiler: {
+    // Optimize client bundle
+    removeConsole: process.env.NODE_ENV === 'production',
+  },
+  modularizeImports: {
+    '@heroicons/react/24/outline': {
+      transform: '@heroicons/react/24/outline/{{member}}',
+    },
+    '@heroicons/react/24/solid': {
+      transform: '@heroicons/react/24/solid/{{member}}',
+    },
+  },
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        path: false,
+        crypto: false,
+        'pino-pretty': false,
+      };
+    }
+    config.externals = [...(config.externals || []), 'pino-pretty', 'rate-limiter-flexible'];
     return config;
   },
 };
 
-module.exports = nextConfig;
-module.exports = withNextIntl(module.exports);
-module.exports = withBundleAnalyzer(module.exports);
-
-if (process.env.CHECK_CIRCULAR_DEPS) {
-  module.exports = withNextCircularDeps(module.exports);
-}
+// Apply plugins
+module.exports = withNextIntl(withBundleAnalyzer(nextConfig));

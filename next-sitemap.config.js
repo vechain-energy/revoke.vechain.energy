@@ -1,4 +1,4 @@
-const SITE_URL = 'https://revoke.cash';
+const SITE_URL = 'https://revoke.vechain.energy';
 
 /** @type {import('next-sitemap').IConfig} */
 module.exports = {

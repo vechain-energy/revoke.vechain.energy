@@ -45,13 +45,13 @@ export const generateMetadata = async ({ params: { locale } }): Promise<Metadata
   const t = await getTranslations({ locale });
 
   return {
-    metadataBase: new URL('https://revoke.cash'),
+    metadataBase: new URL('https://revoke.vechain.energy'),
     title: {
-      template: '%s | Revoke.cash',
+      template: '%s | revoke.vechain.energy',
       default: t('common.meta.title'),
     },
-    description: t('common.meta.description', { chainName: 'Ethereum' }),
-    applicationName: 'Revoke.cash',
+    description: t('common.meta.description', { chainName: 'VeChain' }),
+    applicationName: 'revoke.vechain.energy',
     generator: 'Next.js',
   };
 };
@@ -65,10 +65,11 @@ const MainLayout = ({ children, params }: Props) => {
     <html lang={params.locale}>
       <head>
         <Analytics />
+        <link rel="icon" type="image/svg+xml" href="/assets/images/favicon.svg" />
       </head>
       <body>
         <ThemeScript />
-        <NextIntlClientProvider messages={{ common: messages.common }}>
+        <NextIntlClientProvider messages={messages}>
           <QueryProvider>
             <EthereumProvider>
               <VeChainProvider>

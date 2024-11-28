@@ -1,6 +1,6 @@
 {
-  "name": "revoke.cash",
-  "description": "Take back control of your wallet and stay safe by revoking token approvals you granted on Ethereum and over 100 other networks.",
+  "name": "revoke.vechain.energy",
+  "description": "Take back control of your wallet and stay safe by revoking token approvals you granted on VeChain.",
   "version": "0.1.0",
   "scripts": {
     "dev": "next dev",
@@ -8,13 +8,13 @@
     "build:images": "GENERATE_OG_IMAGES=true next build && tsx scripts/move-cover-images.ts",
     "trim-sitemap": "sed 's,<urlset.*,<urlset xmlns=\"https://www.sitemaps.org/schemas/sitemap/0.9\" xmlns:xhtml=\"http://www.w3.org/1999/xhtml\">,g' public/sitemap.xml",
     "start": "next start",
-    "analyze": "ANALYZE=true yarn build",
+    "analyze": "ANALYZE=true npm run build",
     "lint:checksums": "tsx scripts/lint-checksums.ts && git rm -r --cached -q data && git add --all data",
     "lint": "prettier --write .",
     "postinstall": "husky install",
-    "translations:update": "localazy upload && localazy download && yarn lint",
+    "translations:update": "localazy upload && localazy download && npm run lint",
     "translations:update:md": "localazy upload -k localazy.content.keys.json -c localazy.content.json && localazy download -k localazy.content.keys.json -c localazy.content.json && tsx scripts/remove-untranslated-markdown-files.ts",
-    "test": "yarn test:mocha && yarn test:cypress",
+    "test": "npm run test:mocha && npm run test:cypress",
     "test:cypress": "cypress run",
     "test:mocha": "mocha test/**/*.test.ts",
     "exploits:update": "tsx scripts/update-exploits.ts ../approval-exploit-list ../whois"
@@ -104,9 +104,9 @@
     "typescript": "^5.5.4",
     "walkdir": "^0.4.1"
   },
-  "packageManager": "yarn@3.6.2",
+  "packageManager": "npm@10.2.3",
   "lint-staged": {
-    "*": "yarn prettier -u --write"
+    "*": "npm prettier -u --write"
   },
   "lavamoat": {
     "allowScripts": {
@@ -117,8 +117,9 @@
       "tsx>esbuild": true,
       "viem>ws>bufferutil": true,
       "viem>ws>utf-8-validate": true,
-      "wagmi>@wagmi/connectors>cbw-sdk>keccak": false,
-      "wagmi>@wagmi/connectors>@metamask/sdk>eciesjs>secp256k1": false
+      "@lavamoat/allow-scripts>@lavamoat/preinstall-always-fail": false,
+      "@vechain/dapp-kit>@walletconnect/utils>@walletconnect/types>@walletconnect/keyvaluestorage>unstorage>listhen>@parcel/watcher": false,
+      "wagmi>@wagmi/connectors>cbw-sdk>keccak": false
     }
   },
   "mocha": {
