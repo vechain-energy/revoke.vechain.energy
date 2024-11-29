@@ -1,7 +1,7 @@
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { parseInputAddress } from 'lib/utils/whois';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useRef } from 'react';
 import { useWallet } from '@vechain/dapp-kit-react';
 import Button from './Button';
 import Input from './Input';
@@ -25,6 +25,8 @@ export const AddressSearchBox = ({ className, placeholder, onSubmit, id, value, 
   const [isValid, setIsValid] = useState(false);
   const [hasInput, setHasInput] = useState(false);
   const [isValidating, setIsValidating] = useState(false);
+  const debounceTimeout = useRef<NodeJS.Timeout>();
+  const abortController = useRef<AbortController>();
 
   const validateInput = useCallback(async (val: string) => {
     const trimmedValue = val?.trim() || '';
@@ -35,20 +37,53 @@ export const AddressSearchBox = ({ className, placeholder, onSubmit, id, value, 
       return;
     }
 
+    // Cancel any pending validation
+    if (abortController.current) {
+      abortController.current.abort();
+    }
+    
+    // Create new abort controller for this validation
+    abortController.current = new AbortController();
+    
     setIsValidating(true);
     try {
       // Check if it's a valid address or can be resolved to one
       const address = await parseInputAddress(trimmedValue);
-      setIsValid(!!address);
+      // Only update state if this validation hasn't been aborted
+      if (!abortController.current.signal.aborted) {
+        setIsValid(!!address);
+      }
     } catch {
-      setIsValid(false);
+      if (!abortController.current.signal.aborted) {
+        setIsValid(false);
+      }
     } finally {
-      setIsValidating(false);
+      if (!abortController.current.signal.aborted) {
+        setIsValidating(false);
+      }
     }
   }, []);
 
   useEffect(() => {
-    validateInput(value ?? inputValue);
+    // Clear any existing timeout
+    if (debounceTimeout.current) {
+      clearTimeout(debounceTimeout.current);
+    }
+
+    // Set new timeout for validation
+    debounceTimeout.current = setTimeout(() => {
+      validateInput(value ?? inputValue);
+    }, 300); // 300ms debounce
+
+    return () => {
+      // Cleanup on unmount or when dependencies change
+      if (debounceTimeout.current) {
+        clearTimeout(debounceTimeout.current);
+      }
+      if (abortController.current) {
+        abortController.current.abort();
+      }
+    };
   }, [value, inputValue, validateInput]);
 
   const handleSubmit = useCallback(
