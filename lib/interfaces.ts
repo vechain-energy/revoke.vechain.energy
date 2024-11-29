@@ -30,10 +30,6 @@ export interface AllowanceData extends BaseTokenData {
   expiration?: number; // Only for Permit2 allowances
 }
 
-export interface PermitTokenData extends BaseTokenData {
-  lastCancelled?: TimeLog;
-}
-
 export interface TokenFromList {
   symbol: string;
   decimals?: number;
@@ -240,7 +236,6 @@ export interface TokenMetadata {
 }
 
 export type OnUpdate = ReturnType<typeof useAllowances>['onUpdate'];
-export type OnCancel<T> = (data: T, lastCancelled: TimeLog) => Promise<void>;
 
 export interface EtherscanPlatform {
   domain: string;
