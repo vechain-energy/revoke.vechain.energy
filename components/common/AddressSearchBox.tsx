@@ -82,7 +82,6 @@ export const AddressSearchBox = ({ className, placeholder, onSubmit, id, value, 
         type="submit" 
         style="none" 
         size="none" 
-        aria-label={t('buttons.check')}
         className="focus-visible:outline-none focus-visible:ring-black dark:focus-visible:ring-white focus-visible:ring-2 focus-visible:rounded"
       >
         {hasInput && !isValidating && (
