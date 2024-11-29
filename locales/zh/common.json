@@ -28,6 +28,7 @@
     "revoke": "撤销",
     "revoke_selected": "撤销选定",
     "revoking": "正在撤销",
+    "revoked": "已撤销 ✓",
     "send": "发送",
     "sending": "发送给",
     "switch_chain": "切换区块链",

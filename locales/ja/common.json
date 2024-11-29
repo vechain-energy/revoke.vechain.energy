@@ -28,6 +28,7 @@
     "revoke": "取り消す",
     "revoke_selected": "選択を取り消す",
     "revoking": "取り消中",
+    "revoked": "取り消済み ✓",
     "send": "送信する",
     "sending": "送信中",
     "switch_chain": "ネットワークを切り替える",
