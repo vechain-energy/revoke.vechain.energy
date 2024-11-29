@@ -13,6 +13,20 @@ const nextConfig = {
     // Optimize client bundle
     removeConsole: process.env.NODE_ENV === 'production',
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'vechain.github.io',
+        pathname: '/token-registry/assets/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'vechain.github.io',
+        pathname: '/nft-registry/assets/**',
+      },
+    ],
+  },
   modularizeImports: {
     '@heroicons/react/24/outline': {
       transform: '@heroicons/react/24/outline/{{member}}',

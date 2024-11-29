@@ -1,12 +1,13 @@
 'use client';
 
-import ChainOverlayLogo from 'components/common/ChainOverlayLogo';
 import Href from 'components/common/Href';
 import WithHoverTooltip from 'components/common/WithHoverTooltip';
 import type { BaseTokenData } from 'lib/interfaces';
 import { getChainExplorerUrl } from 'lib/utils/chains';
 import { formatBalance, formatFiatBalance } from 'lib/utils/formatting';
 import { useLayoutEffect, useRef, useState } from 'react';
+import Image from 'next/image';
+import { getVeChainAssetIcon } from 'lib/utils/tokens';
 
 interface Props {
   asset: BaseTokenData;
@@ -15,6 +16,7 @@ interface Props {
 const AssetCell = ({ asset }: Props) => {
   const ref = useRef(null);
   const [showTooltip, setShowTooltip] = useState(false);
+  const [tokenIcon, setTokenIcon] = useState<string | undefined>(undefined);
 
   // This is pretty hacky, but it works to detect that we're on the address page, so single chain usage
   const isOnAddressPage = typeof window !== 'undefined' && window.location.pathname.includes('/address/');
@@ -24,6 +26,14 @@ const AssetCell = ({ asset }: Props) => {
       setShowTooltip(true);
     }
   }, [ref]);
+
+  useLayoutEffect(() => {
+    const loadIcon = async () => {
+      const icon = await getVeChainAssetIcon(asset.contract);
+      setTokenIcon(icon);
+    };
+    loadIcon();
+  }, [asset.contract]);
 
   const explorerUrl = `${getChainExplorerUrl(asset.chainId)}/account/${asset.contract.address}`;
 
@@ -44,13 +54,17 @@ const AssetCell = ({ asset }: Props) => {
     <div className="flex items-center gap-1 py-1">
       <div className="flex flex-col items-start gap-0.5">
         <div className="flex items-center gap-2 text-base w-48 lg:w-56">
-          <ChainOverlayLogo
-            src={asset.metadata.icon}
-            alt={asset.metadata.symbol}
-            chainId={isOnAddressPage ? undefined : asset.chainId}
-            size={24}
-            overlaySize={16}
-          />
+          {tokenIcon ? (
+            <Image
+              src={tokenIcon}
+              alt={asset.metadata.symbol}
+              width={24}
+              height={24}
+              className="rounded-full border border-gray-700 dark:border-gray-200"
+            />
+          ) : (
+            <div className="w-6 h-6 bg-gray-200 dark:bg-gray-700 rounded-full border border-gray-700 dark:border-gray-200" />
+          )}
           {link}
         </div>
 

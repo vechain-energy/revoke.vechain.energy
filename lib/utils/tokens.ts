@@ -22,6 +22,67 @@ import { deduplicateArray } from '.';
 import { withFallback } from './promises';
 import { formatFixedPointBigInt } from './formatting';
 
+interface VeChainToken {
+  name: string;
+  symbol: string;
+  decimals: number;
+  address: string;
+  desc?: string;
+  icon?: string;
+  totalSupply?: string;
+}
+
+interface VeChainNFT {
+  name: string;
+  symbol: string;
+  address: string;
+  desc?: string;
+  icon?: string;
+}
+
+let veChainTokens: VeChainToken[] = [];
+let veChainNFTs: VeChainNFT[] = [];
+let tokensInitialized = false;
+let nftsInitialized = false;
+
+export const initVeChainTokens = async () => {
+  if (tokensInitialized) return;
+  
+  try {
+    const response = await fetch('https://vechain.github.io/token-registry/main.json');
+    veChainTokens = await response.json();
+    tokensInitialized = true;
+  } catch (error) {
+    console.error('Failed to load VeChain token registry:', error);
+  }
+};
+
+export const initVeChainNFTs = async () => {
+  if (nftsInitialized) return;
+  
+  try {
+    const response = await fetch('https://vechain.github.io/nft-registry/main.json');
+    veChainNFTs = await response.json();
+    nftsInitialized = true;
+  } catch (error) {
+    console.error('Failed to load VeChain NFT registry:', error);
+  }
+};
+
+export const getVeChainAssetIcon = async (contract: TokenContract): Promise<string | undefined> => {
+  if (isErc721Contract(contract)) {
+    await initVeChainNFTs();
+    const nft = veChainNFTs.find(t => t.address.toLowerCase() === contract.address.toLowerCase());
+    if (!nft?.icon) return undefined;
+    return `https://vechain.github.io/nft-registry/${nft.icon}`;
+  } else {
+    await initVeChainTokens();
+    const token = veChainTokens.find(t => t.address.toLowerCase() === contract.address.toLowerCase());
+    if (!token?.icon) return undefined;
+    return `https://vechain.github.io/token-registry/assets/${token.icon}`;
+  }
+};
+
 export const isSpamToken = (symbol: string) => {
   const spamRegexes = [
     // Includes http(s)://

@@ -1,8 +1,4 @@
-import { PencilIcon } from '@heroicons/react/24/outline';
-import ControlsWrapper from 'components/allowances/controls/ControlsWrapper';
-import Button from 'components/common/Button';
 import WithHoverTooltip from 'components/common/WithHoverTooltip';
-import { useRevoke } from 'lib/hooks/ethereum/useRevoke';
 import type { AllowanceData, OnUpdate } from 'lib/interfaces';
 import { getAllowanceI18nValues } from 'lib/utils/allowances';
 import { SECOND } from 'lib/utils/time';
@@ -21,8 +17,8 @@ const AllowanceCell = ({ allowance, onUpdate }: Props) => {
   const t = useTranslations();
   const locale = useLocale();
   const [editing, setEditing] = useState<boolean>();
-  const { update } = useRevoke(allowance, onUpdate);
   const { i18nKey, amount, tokenId, symbol } = getAllowanceI18nValues(allowance);
+
 
   const classes = twMerge(
     !allowance.spender && 'text-zinc-500 dark:text-zinc-400',
