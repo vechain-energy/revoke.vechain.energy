@@ -33,7 +33,7 @@ const AllowanceCell = ({ allowance, onUpdate }: Props) => {
   if (editing) {
     return (
       <div className={classes}>
-        <ControlsSection allowance={allowance} update={update} reset={() => setEditing(false)} />
+        <ControlsSection allowance={allowance} reset={() => setEditing(false)} />
       </div>
     );
   }
@@ -52,23 +52,6 @@ const AllowanceCell = ({ allowance, onUpdate }: Props) => {
           </WithHoverTooltip>
         ) : null}
       </div>
-      {allowance.amount && (
-        <ControlsWrapper chainId={allowance.chainId} address={allowance.owner} switchChainSize={undefined}>
-          {(disabled) => (
-            <div>
-              <Button
-                disabled={disabled}
-                onClick={() => setEditing(!editing)}
-                style="tertiary"
-                size="none"
-                aria-label="Edit Token Approval"
-              >
-                <PencilIcon className="w-3 h-3" />
-              </Button>
-            </div>
-          )}
-        </ControlsWrapper>
-      )}
     </div>
   );
 };
