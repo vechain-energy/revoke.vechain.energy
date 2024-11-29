@@ -2,7 +2,6 @@ import RevokeButton from 'components/allowances/controls/RevokeButton';
 import { AllowanceData, TransactionSubmitted } from 'lib/interfaces';
 import { getAllowanceI18nValues } from 'lib/utils/allowances';
 import ControlsWrapper from './ControlsWrapper';
-import UpdateControls from './UpdateControls';
 
 interface Props {
   allowance: AllowanceData;
@@ -21,14 +20,6 @@ const ControlsSection = ({ allowance, revoke, update, reset }: Props) => {
       {(disabled) => (
         <div className="controls-section">
           {revoke && <RevokeButton allowance={allowance} revoke={revoke} disabled={disabled} />}
-          {update && reset && (
-            <UpdateControls
-              update={update}
-              disabled={disabled}
-              reset={reset}
-              defaultValue={amount === 'Unlimited' ? '0' : (amount?.replace(/,/, '') ?? '0')}
-            />
-          )}
         </div>
       )}
     </ControlsWrapper>
