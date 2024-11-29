@@ -1,15 +1,11 @@
 import { ERC721_ABI } from 'lib/abis';
 import { addressToTopic } from 'lib/utils';
-import { generatePatchedAllowanceEvents } from 'lib/utils/allowances';
 import { useMemo } from 'react';
 import { Address, getAbiItem, toEventSelector } from 'viem';
 import { useLogsFullBlockRange } from '../useLogsFullBlockRange';
-import { useOpenSeaProxyAddress } from '../useOpenSeaProxyAddress';
 import { usePermit2Events } from './usePermit2Events';
 
 export const useEvents = (address: Address, chainId: number) => {
-  const { openSeaProxyAddress, isLoading: isOpenSeaProxyAddressLoading } = useOpenSeaProxyAddress(address);
-
   const getErc721EventSelector = (eventName: 'Transfer' | 'Approval' | 'ApprovalForAll') => {
     return toEventSelector(getAbiItem({ abi: ERC721_ABI, name: eventName }));
   };
@@ -39,7 +35,7 @@ export const useEvents = (address: Address, chainId: number) => {
   } = useLogsFullBlockRange('Approval', chainId, { topics: approvalTopics });
 
   const {
-    data: approvalForAllUnpatched,
+    data: approvalForAll,
     isLoading: isApprovalForAllLoading,
     error: approvalForAllError,
   } = useLogsFullBlockRange('ApprovalForAll', chainId, { topics: approvalForAllTopics });
@@ -50,22 +46,8 @@ export const useEvents = (address: Address, chainId: number) => {
     error: permit2ApprovalError,
   } = usePermit2Events(address, chainId);
 
-  // Manually patch the ApprovalForAll events
-  const approvalForAll = useMemo(() => {
-    if (!transferFrom || !transferTo || !approval || !approvalForAllUnpatched) return undefined;
-    return [
-      ...approvalForAllUnpatched,
-      ...generatePatchedAllowanceEvents(address, openSeaProxyAddress, [
-        ...approval,
-        ...approvalForAllUnpatched,
-        ...transferFrom,
-        ...transferTo,
-      ]),
-    ];
-  }, [transferFrom, transferTo, approval, approvalForAllUnpatched, openSeaProxyAddress]);
-
   const isEventsLoading = isTransferFromLoading || isTransferToLoading || isApprovalLoading || isApprovalForAllLoading;
-  const isLoading = isOpenSeaProxyAddressLoading || isEventsLoading || isPermit2ApprovalLoading;
+  const isLoading = isEventsLoading || isPermit2ApprovalLoading;
   const eventsError = transferFromError || transferToError || approvalError || approvalForAllError;
   const error = eventsError || permit2ApprovalError;
 
@@ -73,7 +55,7 @@ export const useEvents = (address: Address, chainId: number) => {
     if (!transferFrom || !transferTo || !approval || !approvalForAll || !permit2Approval) return undefined;
     if (error || isLoading) return undefined;
     return { transferFrom, transferTo, approval, approvalForAll, permit2Approval };
-  }, [transferFrom, transferTo, approval, approvalForAll, permit2Approval]);
+  }, [transferFrom, transferTo, approval, approvalForAll, permit2Approval, error, isLoading]);
 
   return { events, isLoading, error };
 };

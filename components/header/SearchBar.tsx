@@ -1,6 +1,6 @@
 'use client';
 
-import AddressSearchBox from 'components/common/AddressSearchBox';
+import { AddressSearchBox } from 'components/common/AddressSearchBox';
 import { useRouter } from 'lib/i18n/navigation';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';

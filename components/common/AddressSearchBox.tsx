@@ -1,62 +1,101 @@
-import { ArrowRightCircleIcon } from '@heroicons/react/24/outline';
-import { XMarkIcon } from '@heroicons/react/24/solid';
-import { useQuery } from '@tanstack/react-query';
+import { useTranslations } from 'next-intl';
+import { useRouter } from 'next/navigation';
 import { parseInputAddress } from 'lib/utils/whois';
-import { ChangeEventHandler, FormEventHandler, HTMLAttributes } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { useWallet } from '@vechain/dapp-kit-react';
 import Button from './Button';
-import SearchBox from './SearchBox';
-import Spinner from './Spinner';
+import Input from './Input';
+import { ArrowRightCircleIcon } from '@heroicons/react/24/outline';
+import { MagnifyingGlassIcon, XMarkIcon } from '@heroicons/react/24/solid';
 
-interface Props extends Omit<HTMLAttributes<HTMLInputElement>, 'onSubmit'> {
-  onSubmit: FormEventHandler<HTMLFormElement>;
-  onChange: ChangeEventHandler<HTMLInputElement>;
-  value: string;
-  placeholder: string;
+interface Props {
   className?: string;
+  placeholder?: string;
+  onSubmit?: (address: string) => void;
+  id?: string;
+  value?: string;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-const AddressSearchBox = ({ onSubmit, onChange, value, placeholder, className, ...props }: Props) => {
-  const {
-    data: isValid,
-    isLoading: validating,
-    refetch,
-  } = useQuery({
-    queryKey: ['validate', value],
-    queryFn: async () => !!(await parseInputAddress(value)),
-    enabled: !!value,
-    // Chances of this data changing while the user is on the page are very slim
-    staleTime: Infinity,
-  });
+export const AddressSearchBox = ({ className, placeholder, onSubmit, id, value, onChange }: Props) => {
+  const t = useTranslations();
+  const router = useRouter();
+  const { account: connectedAddress } = useWallet();
+  const [inputValue, setInputValue] = useState('');
+  const [isValid, setIsValid] = useState(false);
+  const [hasInput, setHasInput] = useState(false);
+  const [isValidating, setIsValidating] = useState(false);
 
-  const handleSubmit: FormEventHandler<HTMLFormElement> = async (event) => {
-    event.preventDefault();
+  const validateInput = useCallback(async (val: string) => {
+    const trimmedValue = val?.trim() || '';
+    setHasInput(!!trimmedValue);
+    
+    if (!trimmedValue) {
+      setIsValid(false);
+      return;
+    }
 
-    // If the validation is still loading, then we await it so that the submit happens immediately after validation
-    // Note: since the validation is cached, this does not cause an extra network request
-    const { data: isValid } = await refetch();
+    setIsValidating(true);
+    try {
+      // Check if it's a valid address or can be resolved to one
+      const address = await parseInputAddress(trimmedValue);
+      setIsValid(!!address);
+    } catch {
+      setIsValid(false);
+    } finally {
+      setIsValidating(false);
+    }
+  }, []);
 
-    if (!isValid || !value) return;
-    onSubmit(event);
-  };
+  useEffect(() => {
+    validateInput(value ?? inputValue);
+  }, [value, inputValue, validateInput]);
+
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      const address = await parseInputAddress(value ?? inputValue);
+      if (!address) return;
+
+      if (onSubmit) {
+        onSubmit(address);
+      } else {
+        router.push(`/address/${address}`);
+      }
+    },
+    [value, inputValue, onSubmit, router],
+  );
 
   return (
-    <SearchBox
-      onSubmit={handleSubmit}
-      onChange={onChange}
-      value={value}
-      placeholder={placeholder}
-      className={className}
-      {...props}
-    >
-      {value && validating && <Spinner className="w-4 h-4" />}
-      {value && !validating && !isValid && <XMarkIcon className="w-6 h-6 text-red-500" />}
-      {value && !validating && isValid && (
-        <Button style="tertiary" size="none" aria-label="Check Address">
-          <ArrowRightCircleIcon className="w-6 h-6" />
-        </Button>
-      )}
-    </SearchBox>
+    <form onSubmit={handleSubmit} className={`h-9 flex gap-2 items-center border px-2 font-medium focus-within:ring-black dark:focus-within:ring-white ${className}`}>
+      <MagnifyingGlassIcon className="w-6 h-6 text-zinc-500 dark:text-zinc-300" />
+      <input
+        id={id}
+        type="text"
+        placeholder={placeholder ?? t('nav.search')}
+        value={value ?? inputValue}
+        onChange={onChange ?? ((e) => setInputValue(e.target.value))}
+        className="grow focus-visible:outline-none bg-transparent"
+        aria-label={placeholder ?? t('nav.search')}
+      />
+      <Button 
+        type="submit" 
+        style="none" 
+        size="none" 
+        aria-label={t('buttons.check')}
+        className="focus-visible:outline-none focus-visible:ring-black dark:focus-visible:ring-white focus-visible:ring-2 focus-visible:rounded"
+      >
+        {hasInput && !isValidating && (
+          isValid ? (
+            <ArrowRightCircleIcon className="w-6 h-6" />
+          ) : (
+            <XMarkIcon className="w-6 h-6 text-red-500" />
+          )
+        )}
+        {isValidating && (
+          <div className="w-6 h-6 border-2 border-t-transparent border-zinc-500 rounded-full animate-spin" />
+        )}
+      </Button>
+    </form>
   );
 };
-
-export default AddressSearchBox;

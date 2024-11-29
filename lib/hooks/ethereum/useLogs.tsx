@@ -14,9 +14,5 @@ export const useLogs = (name: string, chainId: number, filter: Filter) => {
     enabled: !!chainId && ![filter?.fromBlock, filter?.toBlock, filter?.topics].includes(undefined),
   });
 
-  useEffect(() => {
-    if (result.data) console.log(`${name} events`, result.data);
-  }, [result.data]);
-
   return { ...result };
 };

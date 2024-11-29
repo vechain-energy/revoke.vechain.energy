@@ -1,20 +1,13 @@
 import { ChainId } from '@revoke.cash/chains';
-import { AVVY_DOMAINS_ABI, OPENSEA_REGISTRY_ABI, UNSTOPPABLE_DOMAINS_ABI } from 'lib/abis';
+import { AVVY_DOMAINS_ABI, UNSTOPPABLE_DOMAINS_ABI } from 'lib/abis';
 import {
-  ADDRESS_ZERO,
   ALCHEMY_API_KEY,
   AVVY_DOMAINS_ADDRESS,
-  OPENSEA_REGISTRY_ADDRESS,
   UNSTOPPABLE_DOMAINS_ETH_ADDRESS,
   UNSTOPPABLE_DOMAINS_POLYGON_ADDRESS,
 } from 'lib/constants';
-import { SpenderData, SpenderRiskData } from 'lib/interfaces';
-import { AggregateSpenderDataSource, AggregationType } from 'lib/whois/spender/AggregateSpenderDataSource';
-import { BackendSpenderDataSource } from 'lib/whois/spender/BackendSpenderDataSource';
 import { Address, PublicClient, getAddress, isAddress, namehash } from 'viem';
 import { createViemPublicClientForChain } from './chains';
-
-// Note that we do not use the official UD or Avvy resolution libraries below because they are big and use Ethers.js
 
 const GlobalClients = {
   ETHEREUM: createViemPublicClientForChain(
@@ -26,18 +19,6 @@ const GlobalClients = {
     `https://polygon-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,
   ),
   AVALANCHE: createViemPublicClientForChain(ChainId['AvalancheC-Chain'], 'https://api.avax.network/ext/bc/C/rpc'),
-};
-
-export const getSpenderData = async (
-  address: Address,
-  chainId: number,
-): Promise<SpenderData | SpenderRiskData | null> => {
-  const source = new AggregateSpenderDataSource({
-    aggregationType: AggregationType.PARALLEL_COMBINED,
-    sources: [new BackendSpenderDataSource()],
-  });
-
-  return source.getSpenderData(address, chainId);
 };
 
 export const lookupEnsName = async (address: Address): Promise<string | null> => {
@@ -145,22 +126,6 @@ export const lookupDomainName = async (address: Address) => {
     const avvyNamePromise = lookupAvvyName(address);
     const ensName = await lookupEnsName(address);
     return ensName ?? (await unsNamePromise) ?? (await avvyNamePromise);
-  } catch {
-    return null;
-  }
-};
-
-export const getOpenSeaProxyAddress = async (userAddress: Address): Promise<Address | null> => {
-  try {
-    const proxyAddress = await GlobalClients.ETHEREUM.readContract({
-      address: OPENSEA_REGISTRY_ADDRESS,
-      abi: OPENSEA_REGISTRY_ABI,
-      functionName: 'proxies',
-      args: [userAddress],
-    });
-
-    if (!proxyAddress || proxyAddress === ADDRESS_ZERO) return null;
-    return proxyAddress;
   } catch {
     return null;
   }

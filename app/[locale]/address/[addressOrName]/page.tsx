@@ -1,39 +1,23 @@
-import AllowanceDashboard from 'components/allowances/dashboard/AllowanceDashboard';
-import { getChainName } from 'lib/utils/chains';
-import { shortenAddress } from 'lib/utils/formatting';
+import { getTranslations } from 'next-intl/server';
 import { getAddressAndDomainName } from 'lib/utils/whois';
-import type { Metadata, NextPage } from 'next';
-import { getTranslations, unstable_setRequestLocale } from 'next-intl/server';
+import { notFound } from 'next/navigation';
+import AllowanceDashboard from 'components/allowances/dashboard/AllowanceDashboard';
+import { Address } from 'viem';
 
 interface Props {
   params: {
-    locale: string;
     addressOrName: string;
+    locale: string;
   };
 }
 
-export const generateMetadata = async ({ params: { locale, addressOrName }, searchParams }): Promise<Metadata> => {
-  const t = await getTranslations({ locale });
-
+export default async function Page({ params: { addressOrName, locale } }: Props) {
+  const t = await getTranslations();
   const { address, domainName } = await getAddressAndDomainName(addressOrName);
-  const addressDisplay = domainName ?? shortenAddress(address);
 
-  const chainName = getChainName(Number(searchParams.chainId || 1));
-
-  const title = !!searchParams.chainId
-    ? t('address.meta.title_chain', { addressDisplay, chainName })
-    : t('address.meta.title', { addressDisplay });
-
-  return {
-    title,
-    description: t('common.meta.description', { chainName: chainName ?? 'Ethereum' }),
-  };
-};
-
-const AddressPage: NextPage<Props> = async ({ params }) => {
-  unstable_setRequestLocale(params.locale);
+  if (!address) {
+    notFound();
+  }
 
   return <AllowanceDashboard />;
-};
-
-export default AddressPage;
+}

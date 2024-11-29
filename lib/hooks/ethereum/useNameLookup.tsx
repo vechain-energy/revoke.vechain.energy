@@ -1,29 +1,19 @@
 import { useQuery } from '@tanstack/react-query';
-import { HOUR } from 'lib/utils/time';
-import { lookupAvvyName, lookupEnsName, lookupUnsName } from 'lib/utils/whois';
+import { DAY } from 'lib/utils/time';
+import { resolveVetName } from 'lib/utils/whois';
 import { Address } from 'viem';
 
-export const useNameLookup = (address: Address) => {
-  const { data: ensName } = useQuery({
-    queryKey: ['ensName', address, { persist: true }],
-    queryFn: () => lookupEnsName(address),
+export const useNameLookup = (address: Address | undefined) => {
+  const { data: domainName, isLoading } = useQuery({
+    queryKey: ['domainName', address, { persist: true }],
+    queryFn: async () => {
+      if (!address) return null;
+      return resolveVetName(address);
+    },
     enabled: !!address,
-    staleTime: 12 * HOUR,
+    gcTime: 7 * DAY,
+    staleTime: 5 * DAY,
   });
 
-  const { data: unsName } = useQuery({
-    queryKey: ['unsName', address, { persist: true }],
-    queryFn: () => lookupUnsName(address),
-    enabled: !!address,
-    staleTime: 12 * HOUR,
-  });
-
-  const { data: avvyName } = useQuery<string>({
-    queryKey: ['avvyName', address, { persist: true }],
-    queryFn: () => lookupAvvyName(address),
-    enabled: !!address,
-    staleTime: 12 * HOUR,
-  });
-
-  return { ensName, unsName, avvyName, domainName: ensName || unsName || avvyName };
+  return { domainName, isLoading };
 };
