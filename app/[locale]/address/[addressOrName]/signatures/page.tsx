@@ -1,21 +1,24 @@
+import { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 import SignaturesDashboard from 'components/signatures/SignaturesDashboard';
-import type { NextPage } from 'next';
-import { unstable_setRequestLocale } from 'next-intl/server';
 
-// Re-use metadata generation from the address page
-export { generateMetadata } from '../page';
+export const generateMetadata = async ({ params: { locale } }): Promise<Metadata> => {
+  const t = await getTranslations({ locale });
+
+  return {
+    title: t('address.meta.signatures_title'),
+  };
+};
 
 interface Props {
   params: {
-    locale: string;
     addressOrName: string;
+    locale: string;
   };
 }
 
-const AddressSignaturesPage: NextPage<Props> = ({ params }) => {
-  unstable_setRequestLocale(params.locale);
-
+const SignaturesPage = ({ params }: Props) => {
   return <SignaturesDashboard />;
 };
 
-export default AddressSignaturesPage;
+export default SignaturesPage;

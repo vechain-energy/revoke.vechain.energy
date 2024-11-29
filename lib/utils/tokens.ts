@@ -200,3 +200,32 @@ export const isErc721Contract = (contract: TokenContract): contract is Erc721Tok
 export const isErc20Contract = (contract: TokenContract): contract is Erc20TokenContract => {
   return !isErc721Contract(contract);
 };
+
+export const hasSupportForPermit = async (contract: TokenContract): Promise<boolean> => {
+  if (!isErc20Contract(contract)) return false;
+  
+  try {
+    // Check if contract has DOMAIN_SEPARATOR function
+    const domainSeparator = await contract.publicClient.readContract({
+      ...contract,
+      functionName: 'DOMAIN_SEPARATOR',
+    });
+    return !!domainSeparator;
+  } catch {
+    return false;
+  }
+};
+
+export const getPermitDomain = async (contract: TokenContract) => {
+  if (!isErc20Contract(contract)) return null;
+  
+  try {
+    const domainSeparator = await contract.publicClient.readContract({
+      ...contract,
+      functionName: 'DOMAIN_SEPARATOR',
+    });
+    return domainSeparator;
+  } catch {
+    return null;
+  }
+};
