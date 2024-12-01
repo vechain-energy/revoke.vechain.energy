@@ -97,7 +97,7 @@ export const useVeChainRevokeBatch = (allowances: AllowanceData[], onUpdate: OnU
         for (const allowance of allowances) {
           if (abortController.current.signal.aborted) {
             updateTransaction(allowance, {
-              status: 'cancelled'
+              status: 'not_started'
             });
             continue;
           }
