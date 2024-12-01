@@ -60,7 +60,8 @@ export const useVeChainRevoke = (allowance: AllowanceData, onUpdate: OnUpdate) =
     const clause = {
       to: allowance.contract.address,
       value: '0x0',
-      data
+      data,
+      comment: `Revoke ${allowance.metadata.symbol} token approval for ${allowance.spender}`
     }
 
     return sendTransaction(clause)
@@ -77,7 +78,8 @@ export const useVeChainRevoke = (allowance: AllowanceData, onUpdate: OnUpdate) =
       const clause = {
         to: allowance.contract.address,
         value: '0x0',
-        data
+        data,
+        comment: `Revoke ${allowance.metadata.symbol} NFT #${allowance.tokenId} approval for ${allowance.spender}`
       }
 
       return sendTransaction(clause)
@@ -92,7 +94,8 @@ export const useVeChainRevoke = (allowance: AllowanceData, onUpdate: OnUpdate) =
     const clause = {
       to: allowance.contract.address,
       value: '0x0',
-      data
+      data,
+      comment: `Revoke all ${allowance.metadata.symbol} NFT approvals for ${allowance.spender}`
     }
 
     return sendTransaction(clause)

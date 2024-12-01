@@ -56,9 +56,10 @@ export const useVeChainRevokeBatch = (allowances: AllowanceData[], onUpdate: OnU
     });
 
     return {
-      to: formatAddress(allowance.contract.address),
+      to: allowance.contract.address,
       value: '0x0',
-      data
+      data,
+      comment: `Revoke ${allowance.metadata.symbol} token approval for ${allowance.spender}`
     };
   };
 
@@ -80,9 +81,10 @@ export const useVeChainRevokeBatch = (allowances: AllowanceData[], onUpdate: OnU
       });
 
       return {
-        to: formatAddress(allowance.contract.address),
+        to: allowance.contract.address,
         value: '0x0',
-        data
+        data,
+        comment: `Revoke ${allowance.metadata.symbol} NFT #${allowance.tokenId} approval for ${allowance.spender}`
       };
     }
 
@@ -102,9 +104,10 @@ export const useVeChainRevokeBatch = (allowances: AllowanceData[], onUpdate: OnU
     });
 
     return {
-      to: formatAddress(allowance.contract.address),
+      to: allowance.contract.address,
       value: '0x0',
-      data
+      data,
+      comment: `Revoke all ${allowance.metadata.symbol} NFT approvals for ${allowance.spender}`
     };
   };
 
