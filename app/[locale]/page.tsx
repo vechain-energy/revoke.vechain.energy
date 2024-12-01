@@ -31,7 +31,7 @@ const LandingPage: NextPage<Props> = ({ params }) => {
 
   return (
     <>
-      <SharedLayout searchBar={false}>
+      <SharedLayout searchBarOnDisconnect={false}>
         <div className="flex flex-col items-center">
           <HeroSection />
         </div>

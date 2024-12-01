@@ -7,6 +7,7 @@ import { useTranslations } from 'next-intl';
 import LandingParagraph from './LandingParagraph';
 import AllowanceDashboard from 'components/allowances/dashboard/AllowanceDashboard';
 import { AddressPageContextProvider } from 'lib/hooks/page-context/AddressPageContext';
+import AddressHeader from 'components/address/AddressHeader';
 
 const HeroSection = () => {
   const t = useTranslations();
@@ -14,8 +15,9 @@ const HeroSection = () => {
 
   if (address) {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <div className="w-full max-w-7xl mx-auto px-4 lg:px-8">
         <AddressPageContextProvider address={address as `0x${string}`}>
+          <AddressHeader />
           <AllowanceDashboard />
         </AddressPageContextProvider>
       </div>

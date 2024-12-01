@@ -2,12 +2,12 @@ import SharedLayout from './SharedLayout';
 
 interface Props {
   children: React.ReactNode;
-  searchBar?: boolean;
+  searchBarOnDisconnect?: boolean;
 }
 
-const ContentPageLayout = ({ children, searchBar }: Props) => {
+const ContentPageLayout = ({ children, searchBarOnDisconnect = true }: Props) => {
   return (
-    <SharedLayout searchBar={searchBar} padding>
+    <SharedLayout searchBarOnDisconnect={searchBarOnDisconnect} padding>
       <div className="max-w-3xl mx-auto">{children}</div>
     </SharedLayout>
   );
