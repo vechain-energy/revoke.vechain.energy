@@ -4,20 +4,23 @@ import ConnectButton from 'components/header/ConnectButton';
 import SearchBar from 'components/header/SearchBar';
 import { useVeChainWallet } from 'lib/hooks/vechain/useVeChainWallet';
 import { useTranslations } from 'next-intl';
-import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
 import LandingParagraph from './LandingParagraph';
+import AllowanceDashboard from 'components/allowances/dashboard/AllowanceDashboard';
+import { AddressPageContextProvider } from 'lib/hooks/page-context/AddressPageContext';
 
 const HeroSection = () => {
   const t = useTranslations();
-  const router = useRouter();
   const { address } = useVeChainWallet();
 
-  useEffect(() => {
-    if (address) {
-      router.push(`/address/${address}`);
-    }
-  }, [address, router]);
+  if (address) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <AddressPageContextProvider address={address as `0x${string}`}>
+          <AllowanceDashboard />
+        </AddressPageContextProvider>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col items-center justify-center flex-1 w-full px-4 py-8 mx-auto gap-16 sm:mt-32">
