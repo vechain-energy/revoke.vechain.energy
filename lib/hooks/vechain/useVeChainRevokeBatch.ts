@@ -1,236 +1,151 @@
-import { useCallback, useEffect, useState, useRef } from 'react';
+import { useVeChainWallet } from './useVeChainWallet';
 import { AllowanceData, OnUpdate } from 'lib/interfaces';
 import { useTransactionStore } from 'lib/stores/transaction-store';
 import { getAllowanceKey } from 'lib/utils/allowances';
-import { useVeChainWallet } from './useVeChainWallet';
-import { isErc721Contract } from 'lib/utils/tokens';
-import { ADDRESS_ZERO } from 'lib/constants';
-import { encodeFunctionData } from 'viem';
+import { useCallback, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
-const formatTransactionHash = (hash: string): `0x${string}` => {
-  return (hash.startsWith('0x') ? hash : `0x${hash}`) as `0x${string}`;
-};
-
-const BATCH_SIZE = 20; // VeChain allows up to 20 clauses per transaction
+// ERC20 approve function signature
+const APPROVE_SIGNATURE = '0x095ea7b3';
 
 export const useVeChainRevokeBatch = (allowances: AllowanceData[], onUpdate: OnUpdate) => {
-  const [isRevoking, setIsRevoking] = useState(false);
-  const store = useTransactionStore();
   const { sendTransaction } = useVeChainWallet();
-  const initializedRef = useRef(false);
+  const [isRevoking, setIsRevoking] = useState(false);
+  const abortController = useRef<AbortController>();
+  const results = useTransactionStore((state) => state.results);
+  const updateTransaction = useTransactionStore((state) => state.updateTransaction);
   const t = useTranslations();
 
-  // Initialize transaction store for all allowances
-  useEffect(() => {
-    if (!initializedRef.current) {
-      allowances.forEach((allowance) => {
-        if (!store.results[getAllowanceKey(allowance)]) {
-          store.updateTransaction(allowance, { status: 'not_started' }, false);
-        }
-      });
-      initializedRef.current = true;
+  const pause = useCallback(() => {
+    if (abortController.current) {
+      abortController.current.abort();
     }
-  }, [allowances, store]);
+  }, []);
 
-  const isAllConfirmed = allowances.every(
-    (allowance) => store.results[getAllowanceKey(allowance)]?.status === 'confirmed'
-  );
-
-  const getErc20RevokeClause = (allowance: AllowanceData) => {
-    const data = encodeFunctionData({
-      abi: [{
-        name: 'approve',
-        type: 'function',
-        inputs: [
-          { name: 'spender', type: 'address' },
-          { name: 'amount', type: 'uint256' }
-        ],
-        outputs: [{ type: 'bool' }],
-        stateMutability: 'nonpayable'
-      }],
-      functionName: 'approve',
-      args: [allowance.spender, 0n]
-    });
-
-    return {
-      to: allowance.contract.address,
-      value: '0x0',
-      data,
-      comment: t('common.revoke.comments.token', { 
-        symbol: allowance.metadata.symbol,
-        spender: allowance.spender
-      })
-    };
+  const encodeApproveData = (spender: string, amount: string = '0') => {
+    // Encode parameters: address (spender) and uint256 (amount)
+    const encodedSpender = spender.toLowerCase().replace('0x', '').padStart(64, '0');
+    const encodedAmount = amount.padStart(64, '0');
+    return `${APPROVE_SIGNATURE}${encodedSpender}${encodedAmount}`;
   };
 
-  const getErc721RevokeClause = (allowance: AllowanceData) => {
+  const getClauseComment = (allowance: AllowanceData) => {
     if (allowance.tokenId !== undefined) {
-      const data = encodeFunctionData({
-        abi: [{
-          name: 'approve',
-          type: 'function',
-          inputs: [
-            { name: 'to', type: 'address' },
-            { name: 'tokenId', type: 'uint256' }
-          ],
-          outputs: [],
-          stateMutability: 'nonpayable'
-        }],
-        functionName: 'approve',
-        args: [ADDRESS_ZERO, allowance.tokenId]
+      return t('common.revoke.comments.nft_single', {
+        symbol: allowance.metadata.symbol,
+        tokenId: allowance.tokenId.toString(),
+        spender: allowance.spender
+      });
+    }
+    return t('common.revoke.comments.token', {
+      symbol: allowance.metadata.symbol,
+      spender: allowance.spender
+    });
+  };
+
+  const revoke = useCallback(async (useMultiClause: boolean = true) => {
+    try {
+      setIsRevoking(true);
+      abortController.current = new AbortController();
+
+      // Initialize transaction status for all allowances
+      allowances.forEach((allowance) => {
+        updateTransaction(allowance, { status: 'pending' });
       });
 
-      return {
-        to: allowance.contract.address,
-        value: '0x0',
-        data,
-        comment: t('common.revoke.comments.nft_single', { 
-          symbol: allowance.metadata.symbol,
-          tokenId: allowance.tokenId.toString(),
-          spender: allowance.spender
-        })
-      };
-    }
-
-    const data = encodeFunctionData({
-      abi: [{
-        name: 'setApprovalForAll',
-        type: 'function',
-        inputs: [
-          { name: 'operator', type: 'address' },
-          { name: 'approved', type: 'bool' }
-        ],
-        outputs: [],
-        stateMutability: 'nonpayable'
-      }],
-      functionName: 'setApprovalForAll',
-      args: [allowance.spender, false]
-    });
-
-    return {
-      to: allowance.contract.address,
-      value: '0x0',
-      data,
-      comment: t('common.revoke.comments.nft_all', { 
-        symbol: allowance.metadata.symbol,
-        spender: allowance.spender
-      })
-    };
-  };
-
-  const getRevokeClause = (allowance: AllowanceData) => {
-    return isErc721Contract(allowance.contract)
-      ? getErc721RevokeClause(allowance)
-      : getErc20RevokeClause(allowance);
-  };
-
-  const revokeBatch = async (batchAllowances: AllowanceData[]) => {
-    // Mark all allowances in batch as pending
-    batchAllowances.forEach(allowance => {
-      store.updateTransaction(allowance, { status: 'pending' });
-    });
-
-    try {
-      // Create clauses for all allowances in batch
-      const clauses = batchAllowances.map(getRevokeClause);
-      
-      // Send multi-clause transaction
-      const transactionSubmitted = await sendTransaction(clauses);
-
-      if (transactionSubmitted?.hash) {
-        const transactionHash = formatTransactionHash(transactionSubmitted.hash);
-        
-        // Update all allowances with transaction hash
-        batchAllowances.forEach(allowance => {
-          store.updateTransaction(allowance, { 
-            status: 'pending', 
-            transactionHash
-          });
-        });
+      if (useMultiClause) {
+        // Multi-clause transaction
+        const clauses = allowances.map(allowance => ({
+          to: allowance.contract.address,
+          value: '0x0',
+          data: encodeApproveData(allowance.spender),
+          comment: getClauseComment(allowance)
+        }));
 
         try {
-          // Wait for confirmation
-          await transactionSubmitted.confirmation;
-          
-          // Update all allowances as confirmed
-          batchAllowances.forEach(allowance => {
-            store.updateTransaction(allowance, { 
-              status: 'confirmed', 
-              transactionHash
+          const result = await sendTransaction(clauses);
+          const receipt = await result.confirmation;
+
+          // Update all allowances after the transaction is confirmed
+          for (const allowance of allowances) {
+            updateTransaction(allowance, {
+              status: 'confirmed',
+              transactionHash: receipt.transactionHash
             });
-            // Update allowance data
-            onUpdate(allowance, { amount: 0n });
-          });
+
+            await onUpdate(allowance, { 
+              amount: 0n, 
+              lastUpdated: { 
+                transactionHash: receipt.transactionHash,
+                blockNumber: Number(receipt.blockNumber),
+                timestamp: Math.floor(Date.now() / 1000) 
+              } 
+            });
+          }
         } catch (error) {
-          const message = error instanceof Error ? error.message : 'Transaction failed';
-          // Mark all allowances as reverted
-          batchAllowances.forEach(allowance => {
-            store.updateTransaction(allowance, { 
-              status: 'reverted', 
-              error: message,
-              transactionHash
+          // Mark all allowances as reverted if multi-clause transaction fails
+          allowances.forEach((allowance) => {
+            updateTransaction(allowance, {
+              status: 'reverted',
+              error: error.message
             });
           });
           throw error;
         }
-      }
-
-      return transactionSubmitted;
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Unknown error';
-      if (message.toLowerCase().includes('user rejected')) {
-        batchAllowances.forEach(allowance => {
-          store.updateTransaction(allowance, { status: 'not_started' });
-        });
       } else {
-        batchAllowances.forEach(allowance => {
-          store.updateTransaction(allowance, { 
-            status: 'reverted', 
-            error: message 
-          });
-        });
-      }
-      throw error;
-    }
-  };
+        // Individual transactions
+        for (const allowance of allowances) {
+          if (abortController.current.signal.aborted) {
+            updateTransaction(allowance, {
+              status: 'cancelled'
+            });
+            continue;
+          }
 
-  const revoke = useCallback(async () => {
-    setIsRevoking(true);
+          try {
+            const clause = {
+              to: allowance.contract.address,
+              value: '0x0',
+              data: encodeApproveData(allowance.spender),
+              comment: getClauseComment(allowance)
+            };
 
-    try {
-      // Filter out allowances without spender
-      const validAllowances = allowances.filter(a => a.spender);
-      
-      // Process allowances in batches
-      for (let i = 0; i < validAllowances.length; i += BATCH_SIZE) {
-        const batch = validAllowances.slice(i, i + BATCH_SIZE);
-        try {
-          await revokeBatch(batch);
-        } catch (error) {
-          console.error('Failed to revoke batch:', error);
-          // Continue with next batch even if one fails
+            const result = await sendTransaction(clause);
+            const receipt = await result.confirmation;
+
+            updateTransaction(allowance, {
+              status: 'confirmed',
+              transactionHash: receipt.transactionHash
+            });
+
+            await onUpdate(allowance, { 
+              amount: 0n, 
+              lastUpdated: { 
+                transactionHash: receipt.transactionHash,
+                blockNumber: Number(receipt.blockNumber),
+                timestamp: Math.floor(Date.now() / 1000) 
+              } 
+            });
+          } catch (error) {
+            updateTransaction(allowance, {
+              status: 'reverted',
+              error: error.message
+            });
+            // Continue with next allowance even if one fails
+          }
         }
       }
+    } catch (error) {
+      console.error('Batch revoke error:', error);
+      throw error;
     } finally {
       setIsRevoking(false);
     }
-  }, [allowances, store, sendTransaction]);
+  }, [allowances, onUpdate, sendTransaction, t, updateTransaction]);
 
-  const pause = useCallback(() => {
-    setIsRevoking(false);
-  }, []);
-
-  // Create a results object that only includes the relevant allowances
-  const relevantResults = Object.fromEntries(
-    allowances.map((allowance) => [getAllowanceKey(allowance), store.results[getAllowanceKey(allowance)]])
+  const isAllConfirmed = allowances.every(
+    (allowance) => results[getAllowanceKey(allowance)]?.status === 'confirmed',
   );
 
-  return {
-    results: relevantResults,
-    revoke,
-    pause,
-    isRevoking,
-    isAllConfirmed,
-  };
+  return { revoke, pause, isRevoking, isAllConfirmed, results };
 }; 
