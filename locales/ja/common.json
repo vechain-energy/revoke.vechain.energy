@@ -117,6 +117,13 @@
     "more": "その他",
     "search": "アドレスまたはドメインでアカウントを検索する"
   },
+  "revoke": {
+    "comments": {
+      "token": "{symbol}トークンの{spender}への承認を取り消す",
+      "nft_single": "{symbol} NFT #{tokenId}の{spender}への承認を取り消す",
+      "nft_all": "{symbol} NFTのすべての{spender}への承認を取り消す"
+    }
+  },
   "toasts": {
     "clipboard_failed": "❌ クリップボードにコピーできませんでした。",
     "clipboard_success": "✅ クリップボードにコピーされました",

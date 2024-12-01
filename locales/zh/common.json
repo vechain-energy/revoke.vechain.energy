@@ -117,6 +117,13 @@
     "more": "更多",
     "search": "通过输入地址或域名来搜索账户"
   },
+  "revoke": {
+    "comments": {
+      "token": "撤销{spender}对{symbol}代币的授权",
+      "nft_single": "撤销{spender}对{symbol} NFT #{tokenId}的授权",
+      "nft_all": "撤销{spender}对所有{symbol} NFT的授权"
+    }
+  },
   "toasts": {
     "clipboard_failed": "❌ 无法复制到剪贴板",
     "clipboard_success": "✅ 已复制到剪贴板",

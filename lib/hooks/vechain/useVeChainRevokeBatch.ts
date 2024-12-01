@@ -6,13 +6,10 @@ import { useVeChainWallet } from './useVeChainWallet';
 import { isErc721Contract } from 'lib/utils/tokens';
 import { ADDRESS_ZERO } from 'lib/constants';
 import { encodeFunctionData } from 'viem';
+import { useTranslations } from 'next-intl';
 
 const formatTransactionHash = (hash: string): `0x${string}` => {
   return (hash.startsWith('0x') ? hash : `0x${hash}`) as `0x${string}`;
-};
-
-const formatAddress = (address: string): string => {
-  return address.toLowerCase();
 };
 
 const BATCH_SIZE = 20; // VeChain allows up to 20 clauses per transaction
@@ -22,6 +19,7 @@ export const useVeChainRevokeBatch = (allowances: AllowanceData[], onUpdate: OnU
   const store = useTransactionStore();
   const { sendTransaction } = useVeChainWallet();
   const initializedRef = useRef(false);
+  const t = useTranslations();
 
   // Initialize transaction store for all allowances
   useEffect(() => {
@@ -59,7 +57,10 @@ export const useVeChainRevokeBatch = (allowances: AllowanceData[], onUpdate: OnU
       to: allowance.contract.address,
       value: '0x0',
       data,
-      comment: `Revoke ${allowance.metadata.symbol} token approval for ${allowance.spender}`
+      comment: t('common.revoke.comments.token', { 
+        symbol: allowance.metadata.symbol,
+        spender: allowance.spender
+      })
     };
   };
 
@@ -84,7 +85,11 @@ export const useVeChainRevokeBatch = (allowances: AllowanceData[], onUpdate: OnU
         to: allowance.contract.address,
         value: '0x0',
         data,
-        comment: `Revoke ${allowance.metadata.symbol} NFT #${allowance.tokenId} approval for ${allowance.spender}`
+        comment: t('common.revoke.comments.nft_single', { 
+          symbol: allowance.metadata.symbol,
+          tokenId: allowance.tokenId.toString(),
+          spender: allowance.spender
+        })
       };
     }
 
@@ -107,7 +112,10 @@ export const useVeChainRevokeBatch = (allowances: AllowanceData[], onUpdate: OnU
       to: allowance.contract.address,
       value: '0x0',
       data,
-      comment: `Revoke all ${allowance.metadata.symbol} NFT approvals for ${allowance.spender}`
+      comment: t('common.revoke.comments.nft_all', { 
+        symbol: allowance.metadata.symbol,
+        spender: allowance.spender
+      })
     };
   };
 

@@ -111,6 +111,13 @@
     "more": "Más",
     "search": "Buscar Cuentas por Dirección o Dominio"
   },
+  "revoke": {
+    "comments": {
+      "token": "Revocar aprobación del token {symbol} para {spender}",
+      "nft_single": "Revocar aprobación del NFT {symbol} #{tokenId} para {spender}",
+      "nft_all": "Revocar todas las aprobaciones de NFT {symbol} para {spender}"
+    }
+  },
   "toasts": {
     "clipboard_failed": "❌ No se pudo copiar al portapapeles",
     "clipboard_success": "✅ Copiado al portapapeles",

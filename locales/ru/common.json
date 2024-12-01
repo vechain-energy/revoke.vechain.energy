@@ -111,6 +111,13 @@
     "more": "Больше",
     "search": "Поиск учетных записей по адресу или домену"
   },
+  "revoke": {
+    "comments": {
+      "token": "Отозвать разрешение токена {symbol} для {spender}",
+      "nft_single": "Отозвать разрешение NFT {symbol} #{tokenId} для {spender}",
+      "nft_all": "Отозвать все разрешения NFT {symbol} для {spender}"
+    }
+  },
   "toasts": {
     "clipboard_failed": "❌ Не удалось скопировать в буфер",
     "clipboard_success": "✅ Скопировано в буфер обмена",

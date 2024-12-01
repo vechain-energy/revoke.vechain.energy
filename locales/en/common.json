@@ -111,6 +111,13 @@
     "more": "More",
     "search": "Search Accounts by Address or Domain"
   },
+  "revoke": {
+    "comments": {
+      "token": "Revoke {symbol} token approval for {spender}",
+      "nft_single": "Revoke {symbol} NFT #{tokenId} approval for {spender}",
+      "nft_all": "Revoke all {symbol} NFT approvals for {spender}"
+    }
+  },
   "toasts": {
     "clipboard_failed": "❌ Couldn't copy to clipboard",
     "clipboard_success": "✅ Copied to clipboard",

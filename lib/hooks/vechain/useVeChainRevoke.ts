@@ -8,6 +8,7 @@ import { useConnex } from '@vechain/dapp-kit-react'
 import { isErc721Contract } from 'lib/utils/tokens'
 import { ADDRESS_ZERO } from 'lib/constants'
 import { encodeFunctionData } from 'viem'
+import { useTranslations } from 'next-intl'
 
 const ERC20_ABI = [{
   name: 'approve',
@@ -45,6 +46,7 @@ const ERC721_APPROVAL_FOR_ALL_ABI = [{
 export const useVeChainRevoke = (allowance: AllowanceData, onUpdate: OnUpdate) => {
   const store = useTransactionStore()
   const { sendTransaction } = useVeChainWallet()
+  const t = useTranslations()
 
   if (!allowance.spender) {
     return { revoke: undefined }
@@ -61,7 +63,10 @@ export const useVeChainRevoke = (allowance: AllowanceData, onUpdate: OnUpdate) =
       to: allowance.contract.address,
       value: '0x0',
       data,
-      comment: `Revoke ${allowance.metadata.symbol} token approval for ${allowance.spender}`
+      comment: t('common.revoke.comments.token', {
+        symbol: allowance.metadata.symbol,
+        spender: allowance.spender
+      })
     }
 
     return sendTransaction(clause)
@@ -79,7 +84,11 @@ export const useVeChainRevoke = (allowance: AllowanceData, onUpdate: OnUpdate) =
         to: allowance.contract.address,
         value: '0x0',
         data,
-        comment: `Revoke ${allowance.metadata.symbol} NFT #${allowance.tokenId} approval for ${allowance.spender}`
+        comment: t('common.revoke.comments.nft_single', {
+          symbol: allowance.metadata.symbol,
+          tokenId: allowance.tokenId.toString(),
+          spender: allowance.spender
+        })
       }
 
       return sendTransaction(clause)
@@ -95,7 +104,10 @@ export const useVeChainRevoke = (allowance: AllowanceData, onUpdate: OnUpdate) =
       to: allowance.contract.address,
       value: '0x0',
       data,
-      comment: `Revoke all ${allowance.metadata.symbol} NFT approvals for ${allowance.spender}`
+      comment: t('common.revoke.comments.nft_all', {
+        symbol: allowance.metadata.symbol,
+        spender: allowance.spender
+      })
     }
 
     return sendTransaction(clause)
@@ -104,24 +116,24 @@ export const useVeChainRevoke = (allowance: AllowanceData, onUpdate: OnUpdate) =
   const wrappedRevoke = useCallback(async () => {
     try {
       store.updateTransaction(allowance, { status: 'pending' })
-      
-      const revokeFunction = isErc721Contract(allowance.contract) 
-        ? revokeErc721Allowance 
+
+      const revokeFunction = isErc721Contract(allowance.contract)
+        ? revokeErc721Allowance
         : revokeErc20Allowance
 
       const transactionSubmitted = await revokeFunction()
 
       if (transactionSubmitted?.hash) {
-        store.updateTransaction(allowance, { 
-          status: 'pending', 
-          transactionHash: `0x${transactionSubmitted.hash}` as `0x${string}` 
+        store.updateTransaction(allowance, {
+          status: 'pending',
+          transactionHash: `0x${transactionSubmitted.hash}` as `0x${string}`
         })
 
         // Wait for confirmation
         await transactionSubmitted.confirmation
-        store.updateTransaction(allowance, { 
-          status: 'confirmed', 
-          transactionHash: `0x${transactionSubmitted.hash}` as `0x${string}` 
+        store.updateTransaction(allowance, {
+          status: 'confirmed',
+          transactionHash: `0x${transactionSubmitted.hash}` as `0x${string}`
         })
       }
 
