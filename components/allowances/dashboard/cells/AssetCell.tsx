@@ -60,7 +60,7 @@ const AssetCell = ({ asset }: Props) => {
               alt={asset.metadata.symbol}
               width={24}
               height={24}
-              className="rounded-full border border-gray-700 dark:border-gray-200"
+              className="rounded-full border border-gray-700 dark:border-gray-200 w-6 h-6"
             />
           ) : (
             <div className="w-6 h-6 bg-gray-200 dark:bg-gray-700 rounded-full border border-gray-700 dark:border-gray-200" />

@@ -25,7 +25,7 @@ const TableBody = <T,>({ table, isLoading, loaderRows }: Props<T>) => {
       {table.getRowModel().rows.map((row) => (
         <tr key={row.id} className="border-t border-zinc-300 dark:border-zinc-500">
           {row.getVisibleCells().map((cell) => (
-            <td key={cell.id} className={twMerge('overflow-hidden px-2', cell.column.id === ColumnId.SELECT && 'w-0')}>
+            <td key={cell.id} className={twMerge('overflow-hidden px-2 py-1', cell.column.id === ColumnId.SELECT && 'w-0')}>
               {flexRender(cell.column.columnDef.cell, cell.getContext())}
             </td>
           ))}
