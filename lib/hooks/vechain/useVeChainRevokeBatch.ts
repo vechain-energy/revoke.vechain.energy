@@ -1,12 +1,45 @@
 import { useVeChainWallet } from './useVeChainWallet';
 import { AllowanceData, OnUpdate } from 'lib/interfaces';
 import { useTransactionStore } from 'lib/stores/transaction-store';
-import { getAllowanceKey } from 'lib/utils/allowances';
 import { useCallback, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
+import { isErc721Contract } from 'lib/utils/tokens';
+import { ADDRESS_ZERO } from 'lib/constants';
+import { encodeFunctionData } from 'viem';
+import { getAllowanceKey } from 'lib/utils/allowances';
 
-// ERC20 approve function signature
-const APPROVE_SIGNATURE = '0x095ea7b3';
+const ERC20_ABI = [{
+  name: 'approve',
+  type: 'function',
+  inputs: [
+    { name: 'spender', type: 'address' },
+    { name: 'amount', type: 'uint256' }
+  ],
+  outputs: [{ type: 'bool' }],
+  stateMutability: 'nonpayable'
+}] as const;
+
+const ERC721_APPROVE_ABI = [{
+  name: 'approve',
+  type: 'function',
+  inputs: [
+    { name: 'to', type: 'address' },
+    { name: 'tokenId', type: 'uint256' }
+  ],
+  outputs: [],
+  stateMutability: 'nonpayable'
+}] as const;
+
+const ERC721_APPROVAL_FOR_ALL_ABI = [{
+  name: 'setApprovalForAll',
+  type: 'function',
+  inputs: [
+    { name: 'operator', type: 'address' },
+    { name: 'approved', type: 'bool' }
+  ],
+  outputs: [],
+  stateMutability: 'nonpayable'
+}] as const;
 
 export const useVeChainRevokeBatch = (allowances: AllowanceData[], onUpdate: OnUpdate) => {
   const { sendTransaction } = useVeChainWallet();
@@ -22,11 +55,26 @@ export const useVeChainRevokeBatch = (allowances: AllowanceData[], onUpdate: OnU
     }
   }, []);
 
-  const encodeApproveData = (spender: string, amount: string = '0') => {
-    // Encode parameters: address (spender) and uint256 (amount)
-    const encodedSpender = spender.toLowerCase().replace('0x', '').padStart(64, '0');
-    const encodedAmount = amount.padStart(64, '0');
-    return `${APPROVE_SIGNATURE}${encodedSpender}${encodedAmount}`;
+  const encodeRevokeData = (allowance: AllowanceData) => {
+    if (isErc721Contract(allowance.contract)) {
+      if (allowance.tokenId !== undefined) {
+        return encodeFunctionData({
+          abi: ERC721_APPROVE_ABI,
+          functionName: 'approve',
+          args: [ADDRESS_ZERO, allowance.tokenId]
+        });
+      }
+      return encodeFunctionData({
+        abi: ERC721_APPROVAL_FOR_ALL_ABI,
+        functionName: 'setApprovalForAll',
+        args: [allowance.spender, false]
+      });
+    }
+    return encodeFunctionData({
+      abi: ERC20_ABI,
+      functionName: 'approve',
+      args: [allowance.spender, 0n]
+    });
   };
 
   const getClauseComment = (allowance: AllowanceData) => {
@@ -34,6 +82,12 @@ export const useVeChainRevokeBatch = (allowances: AllowanceData[], onUpdate: OnU
       return t('common.revoke.comments.nft_single', {
         symbol: allowance.metadata.symbol,
         tokenId: allowance.tokenId.toString(),
+        spender: allowance.spender
+      });
+    }
+    if (isErc721Contract(allowance.contract)) {
+      return t('common.revoke.comments.nft_all', {
+        symbol: allowance.metadata.symbol,
         spender: allowance.spender
       });
     }
@@ -58,7 +112,7 @@ export const useVeChainRevokeBatch = (allowances: AllowanceData[], onUpdate: OnU
         const clauses = allowances.map(allowance => ({
           to: allowance.contract.address,
           value: '0x0',
-          data: encodeApproveData(allowance.spender),
+          data: encodeRevokeData(allowance),
           comment: getClauseComment(allowance)
         }));
 
@@ -106,7 +160,7 @@ export const useVeChainRevokeBatch = (allowances: AllowanceData[], onUpdate: OnU
             const clause = {
               to: allowance.contract.address,
               value: '0x0',
-              data: encodeApproveData(allowance.spender),
+              data: encodeRevokeData(allowance),
               comment: getClauseComment(allowance)
             };
 
