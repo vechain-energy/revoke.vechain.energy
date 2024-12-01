@@ -47,17 +47,11 @@ export function useVeChainDAppKitWallet() {
       if (!vendor) throw new Error('Vendor not available')
       if (!thor) throw new Error('Thor not available')
       
-      const { to, data, value = '0x0' } = transaction
-      
-      // Create a transaction clause
-      const clause = {
-        to,
-        value,
-        data,
-      }
+      // Handle both single clause and array of clauses
+      const clauses = Array.isArray(transaction) ? transaction : [transaction]
 
       // Sign and send the transaction
-      const response = await vendor.sign('tx', [clause]).request()
+      const response = await vendor.sign('tx', clauses).request()
       
       // Wait for transaction to be mined
       const tx = thor.transaction(response.txid)

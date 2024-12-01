@@ -11,6 +11,12 @@ const formatTransactionHash = (hash: string): `0x${string}` => {
   return (hash.startsWith('0x') ? hash : `0x${hash}`) as `0x${string}`;
 };
 
+const formatAddress = (address: string): string => {
+  return address.toLowerCase();
+};
+
+const BATCH_SIZE = 20; // VeChain allows up to 20 clauses per transaction
+
 export const useVeChainRevokeBatch = (allowances: AllowanceData[], onUpdate: OnUpdate) => {
   const [isRevoking, setIsRevoking] = useState(false);
   const store = useTransactionStore();
@@ -33,7 +39,7 @@ export const useVeChainRevokeBatch = (allowances: AllowanceData[], onUpdate: OnU
     (allowance) => store.results[getAllowanceKey(allowance)]?.status === 'confirmed'
   );
 
-  const revokeErc20Allowance = async (allowance: AllowanceData) => {
+  const getErc20RevokeClause = (allowance: AllowanceData) => {
     const data = encodeFunctionData({
       abi: [{
         name: 'approve',
@@ -49,16 +55,14 @@ export const useVeChainRevokeBatch = (allowances: AllowanceData[], onUpdate: OnU
       args: [allowance.spender, 0n]
     });
 
-    const clause = {
-      to: allowance.contract.address,
+    return {
+      to: formatAddress(allowance.contract.address),
       value: '0x0',
       data
     };
-
-    return sendTransaction(clause);
   };
 
-  const revokeErc721Allowance = async (allowance: AllowanceData) => {
+  const getErc721RevokeClause = (allowance: AllowanceData) => {
     if (allowance.tokenId !== undefined) {
       const data = encodeFunctionData({
         abi: [{
@@ -75,13 +79,11 @@ export const useVeChainRevokeBatch = (allowances: AllowanceData[], onUpdate: OnU
         args: [ADDRESS_ZERO, allowance.tokenId]
       });
 
-      const clause = {
-        to: allowance.contract.address,
+      return {
+        to: formatAddress(allowance.contract.address),
         value: '0x0',
         data
       };
-
-      return sendTransaction(clause);
     }
 
     const data = encodeFunctionData({
@@ -99,48 +101,65 @@ export const useVeChainRevokeBatch = (allowances: AllowanceData[], onUpdate: OnU
       args: [allowance.spender, false]
     });
 
-    const clause = {
-      to: allowance.contract.address,
+    return {
+      to: formatAddress(allowance.contract.address),
       value: '0x0',
       data
     };
-
-    return sendTransaction(clause);
   };
 
-  const revokeAllowance = async (allowance: AllowanceData) => {
-    try {
-      store.updateTransaction(allowance, { status: 'pending' });
-      
-      const revokeFunction = isErc721Contract(allowance.contract) 
-        ? () => revokeErc721Allowance(allowance)
-        : () => revokeErc20Allowance(allowance);
+  const getRevokeClause = (allowance: AllowanceData) => {
+    return isErc721Contract(allowance.contract)
+      ? getErc721RevokeClause(allowance)
+      : getErc20RevokeClause(allowance);
+  };
 
-      const transactionSubmitted = await revokeFunction();
+  const revokeBatch = async (batchAllowances: AllowanceData[]) => {
+    // Mark all allowances in batch as pending
+    batchAllowances.forEach(allowance => {
+      store.updateTransaction(allowance, { status: 'pending' });
+    });
+
+    try {
+      // Create clauses for all allowances in batch
+      const clauses = batchAllowances.map(getRevokeClause);
+      
+      // Send multi-clause transaction
+      const transactionSubmitted = await sendTransaction(clauses);
 
       if (transactionSubmitted?.hash) {
         const transactionHash = formatTransactionHash(transactionSubmitted.hash);
-        store.updateTransaction(allowance, { 
-          status: 'pending', 
-          transactionHash
+        
+        // Update all allowances with transaction hash
+        batchAllowances.forEach(allowance => {
+          store.updateTransaction(allowance, { 
+            status: 'pending', 
+            transactionHash
+          });
         });
 
         try {
           // Wait for confirmation
           await transactionSubmitted.confirmation;
-          store.updateTransaction(allowance, { 
-            status: 'confirmed', 
-            transactionHash
-          });
           
-          // Update allowance data
-          onUpdate(allowance, { amount: 0n });
+          // Update all allowances as confirmed
+          batchAllowances.forEach(allowance => {
+            store.updateTransaction(allowance, { 
+              status: 'confirmed', 
+              transactionHash
+            });
+            // Update allowance data
+            onUpdate(allowance, { amount: 0n });
+          });
         } catch (error) {
           const message = error instanceof Error ? error.message : 'Transaction failed';
-          store.updateTransaction(allowance, { 
-            status: 'reverted', 
-            error: message,
-            transactionHash
+          // Mark all allowances as reverted
+          batchAllowances.forEach(allowance => {
+            store.updateTransaction(allowance, { 
+              status: 'reverted', 
+              error: message,
+              transactionHash
+            });
           });
           throw error;
         }
@@ -150,11 +169,15 @@ export const useVeChainRevokeBatch = (allowances: AllowanceData[], onUpdate: OnU
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unknown error';
       if (message.toLowerCase().includes('user rejected')) {
-        store.updateTransaction(allowance, { status: 'not_started' });
+        batchAllowances.forEach(allowance => {
+          store.updateTransaction(allowance, { status: 'not_started' });
+        });
       } else {
-        store.updateTransaction(allowance, { 
-          status: 'reverted', 
-          error: message 
+        batchAllowances.forEach(allowance => {
+          store.updateTransaction(allowance, { 
+            status: 'reverted', 
+            error: message 
+          });
         });
       }
       throw error;
@@ -165,15 +188,17 @@ export const useVeChainRevokeBatch = (allowances: AllowanceData[], onUpdate: OnU
     setIsRevoking(true);
 
     try {
-      for (let i = 0; i < allowances.length; i++) {
-        const allowance = allowances[i];
-        if (!allowance.spender) continue;
-
+      // Filter out allowances without spender
+      const validAllowances = allowances.filter(a => a.spender);
+      
+      // Process allowances in batches
+      for (let i = 0; i < validAllowances.length; i += BATCH_SIZE) {
+        const batch = validAllowances.slice(i, i + BATCH_SIZE);
         try {
-          await revokeAllowance(allowance);
+          await revokeBatch(batch);
         } catch (error) {
-          console.error('Failed to revoke allowance:', error);
-          // Continue with next allowance even if one fails
+          console.error('Failed to revoke batch:', error);
+          // Continue with next batch even if one fails
         }
       }
     } finally {
