@@ -32,7 +32,7 @@ export const CHAINS: Record<number, Chain> = {
     nativeToken: 'VET',
     logoUrl: '/assets/images/vendor/chains/vechain.svg',
     rpc: {
-      main: `https://rpc-mainnet.vechain.energy`,
+      main: `https://node-mainnet.vechain.energy/rpc`,
     },
     //    deployedContracts: { ...MULTICALL },
     isTestnet: false,
