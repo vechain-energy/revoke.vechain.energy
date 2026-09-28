@@ -1,6 +1,7 @@
 import { ChainId } from '@revoke.cash/chains';
 import { ALCHEMY_API_KEY, INFURA_API_KEY } from 'lib/constants';
 import { RateLimit } from 'lib/interfaces';
+import { VECHAIN_NODE_URL } from 'lib/rpc/thor';
 import { AggregatePriceStrategy, AggregationType } from 'lib/price/AggregatePriceStrategy';
 import { HardcodedPriceStrategy } from 'lib/price/HardcodedPriceStrategy';
 import { PriceStrategy } from 'lib/price/PriceStrategy';
@@ -32,7 +33,9 @@ export const CHAINS: Record<number, Chain> = {
     nativeToken: 'VET',
     logoUrl: '/assets/images/vendor/chains/vechain.svg',
     rpc: {
-      main: `https://node-mainnet.vechain.energy/rpc`,
+      type: 'thor',
+      main: VECHAIN_NODE_URL,
+      free: VECHAIN_NODE_URL,
     },
     //    deployedContracts: { ...MULTICALL },
     isTestnet: false,

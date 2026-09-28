@@ -19,6 +19,12 @@ yarn dev
 
 ### Environment variables
 
+VeChain reads use `https://mainnet.vechain.org` directly through the Thor REST API.
+Set `NEXT_PUBLIC_VECHAIN_NODE_URL` to use another mainnet Thor node for reads and the wallet.
+Any VeChain override in `NEXT_PUBLIC_NODE_URLS` must also be a Thor REST base URL, without `/rpc`.
+Event queries paginate `/logs/event` with indexes; contract reads POST encoded calldata to `/accounts/*`.
+There is no application request queue or fixed delay. Public nodes can still enforce their own limits.
+
 An `.example.env` file is provided that needs to be copied into a `.env` file and filled out.
 
 Some of these variables are integral to the functioning of Revoke.cash:

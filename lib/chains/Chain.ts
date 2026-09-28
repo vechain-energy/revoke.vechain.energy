@@ -2,7 +2,7 @@ import { getChain } from '@revoke.cash/chains';
 import { ETHERSCAN_API_KEYS, ETHERSCAN_RATE_LIMITS, INFURA_API_KEY, RPC_OVERRIDES } from 'lib/constants';
 import { EtherscanPlatform, RateLimit } from 'lib/interfaces';
 import { PriceStrategy } from 'lib/price/PriceStrategy';
-import { throttledHttp } from 'lib/rpc/transport';
+import { thorTransport } from 'lib/rpc/thor';
 import { SECOND } from 'lib/utils/time';
 import {
   AddEthereumChainParameter,
@@ -11,6 +11,7 @@ import {
   Chain as ViemChain,
   createPublicClient,
   defineChain,
+  http,
 } from 'viem';
 
 export interface ChainOptions {
@@ -24,6 +25,7 @@ export interface ChainOptions {
   explorerUrl?: string;
   etherscanCompatibleApiUrl?: string;
   rpc?: {
+    type?: 'thor';
     main?: string | string[];
     logs?: string;
     free?: string;
@@ -217,8 +219,11 @@ export class Chain {
     return createPublicClient({
       pollingInterval: 4 * SECOND,
       chain: this.getViemChainConfig(),
-      transport: throttledHttp(overrideUrl ?? this.getRpcUrl()),
-      batch: { multicall: true },
+      transport:
+        this.options.rpc?.type === 'thor'
+          ? thorTransport(overrideUrl ?? this.getRpcUrl())
+          : http(overrideUrl ?? this.getRpcUrl()),
+      batch: { multicall: this.options.rpc?.type !== 'thor' },
     });
   }
 
